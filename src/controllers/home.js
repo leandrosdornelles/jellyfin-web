@@ -13,11 +13,13 @@ class HomeView extends TabbedView {
     onPause() {
         super.onPause(this);
         document.querySelector('.skinHeader').classList.remove('noHomeButtonHeader');
+        document.body.classList.remove('vcHomeV2Active');
     }
 
     onResume(options) {
         super.onResume(this, options);
         document.querySelector('.skinHeader').classList.add('noHomeButtonHeader');
+        document.body.classList.add('vcHomeV2Active');
     }
 
     getDefaultTabIndex() {
