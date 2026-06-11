@@ -26,6 +26,8 @@ import './homesections.scss';
 const MAX_SECTIONS = 10;
 const MAX_SECTIONS_TV = MAX_SECTIONS + 1; // TV layout can have an extra section to ensure a library section is always visible
 let searchShortcutBound = false;
+let headerObserverBound = false;
+let currentHeroItemId = null;
 
 export function getDefaultSection(index) {
     if (index < 0 || index > DEFAULT_SECTIONS.length) return '';
@@ -75,6 +77,14 @@ function getV2SectionsToShow(userSettings) {
 }
 
 export function loadSections(elem, apiClient, user, userSettings) {
+    document.body.classList.add('vcHomeV2Active');
+    document.body.classList.add('hiddenViewMenuBar');
+    document.body.classList.remove('withSectionTabs');
+    document.documentElement.classList.add('vcHomeV2Active');
+    elem.closest('.homePage')?.classList.add('vcHomeV2Page', 'noSecondaryNavPage');
+    hideHomeHeader();
+    bindHeaderObserver();
+
     const userId = user.Id || apiClient.getCurrentUserId();
     return queryClient
         .fetchQuery(getUserViewsQuery(toApi(apiClient), { userId }))
@@ -108,9 +118,9 @@ export function loadSections(elem, apiClient, user, userSettings) {
                 bindDecisionShortcuts(elem);
                 bindSearchShortcut();
 
+                const heroPromise = loadHero(elem.querySelector('.vcHomeV2Hero'), apiClient, user);
                 const promises = [
-                    loadHero(elem.querySelector('.vcHomeV2Hero'), apiClient, user),
-                    loadDecisionSection(elem.querySelector('.vcHomeV2Decision'), apiClient, user),
+                    heroPromise.then(() => loadDecisionSection(elem.querySelector('.vcHomeV2Decision'), apiClient, user)),
                     loadUtilitySection(elem.querySelector('.vcHomeV2Utility'), apiClient, user, userViews)
                 ];
                 promises.push(...getV2SectionsToShow(userSettings)
@@ -144,6 +154,30 @@ export function loadSections(elem, apiClient, user, userSettings) {
                 }
             }
         });
+}
+
+function hideHomeHeader() {
+    const skinHeader = document.querySelector('.skinHeader');
+    skinHeader?.classList.add('vcHomeV2HideHeader');
+    skinHeader?.style.setProperty('display', 'none', 'important');
+}
+
+function bindHeaderObserver() {
+    if (headerObserverBound) return;
+
+    headerObserverBound = true;
+    const observer = new MutationObserver(() => {
+        if (document.body.classList.contains('vcHomeV2Active')) {
+            document.body.classList.add('hiddenViewMenuBar');
+            document.body.classList.remove('withSectionTabs');
+            hideHomeHeader();
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
 }
 
 function getSidebarHtml(apiClient, user, userViews) {
@@ -287,11 +321,11 @@ function getDecisionItems(apiClient, user, filter) {
         getResumeItems(apiClient, user, 6).catch(() => []),
         getNextUpItems(apiClient, user, 8).catch(() => []),
         getLatestItems(apiClient, user, 8).catch(() => [])
-    ]).then(([resumeItems, nextUpItems, latestItems]) => dedupeItems([
+    ]).then(([resumeItems, nextUpItems, latestItems]) => filterOutHomeDuplicates(dedupeItems([
         ...resumeItems.slice(1).map(item => ({ ...item, VcReason: 'Continuar' })),
         ...nextUpItems.map(item => ({ ...item, VcReason: 'A seguir' })),
         ...latestItems.map(item => ({ ...item, VcReason: 'Novo no servidor' }))
-    ]).filter(item => matchesDecisionFilter(item, filter)).slice(0, 12));
+    ])).filter(item => matchesDecisionFilter(item, filter)).slice(0, 12));
 }
 
 function matchesDecisionFilter(item, filter) {
@@ -318,22 +352,31 @@ function loadDecisionSection(elem, apiClient, user) {
         <div class="vcHomeV2SectionHead padded-left padded-right">
             <div>
                 <h2 class="sectionTitle sectionTitle-cards">Para assistir agora</h2>
-                <p>Continue, próximo episódio e novidades relevantes em uma fila curta.</p>
             </div>
             <a is="emby-linkbutton" href="${appRouter.getRouteUrl('nextup', { serverId: apiClient.serverId() })}" class="raised vcHomeV2SeeAll">Ver próximos</a>
         </div>
-        <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true">
+        <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true" data-scrollbuttons="false">
             <div is="emby-itemscontainer" class="itemsContainer vcHomeV2DecisionRail scrollSlider focuscontainer-x" data-monitor="videoplayback,markplayed"></div>
         </div>`;
 
     const itemsContainer = elem.querySelector('.itemsContainer');
     if (!itemsContainer) return Promise.resolve();
 
-    itemsContainer.fetchData = () => getDecisionItems(apiClient, user, elem.dataset.vcFilter || 'now');
+    itemsContainer.fetchData = () => getDecisionItems(apiClient, user, elem.dataset.vcFilter || 'now')
+        .then(items => toggleSectionByItems(elem, items));
     itemsContainer.getItemsHtml = items => getDecisionCardsHtml(apiClient, items);
     itemsContainer.parentContainer = elem;
 
     return Promise.resolve();
+}
+
+function toggleSectionByItems(elem, items) {
+    elem.classList.toggle('hide', !items?.length);
+    return items || [];
+}
+
+function filterOutHomeDuplicates(items) {
+    return items.filter(item => (item?.Id || item?.ItemId) !== currentHeroItemId);
 }
 
 function getDecisionCardsHtml(apiClient, items) {
@@ -341,8 +384,8 @@ function getDecisionCardsHtml(apiClient, items) {
 }
 
 function getDecisionCardHtml(apiClient, item) {
-    const id = item.Id || item.ItemId;
     const serverId = item.ServerId || apiClient.serverId();
+    const itemAttributes = getItemActionAttributes(item, serverId);
     const title = escapeHtml(item.SeriesName || item.Name || '');
     const subtitle = escapeHtml(getDecisionSubtitle(item));
     const reason = escapeHtml(item.VcReason || getDecisionReason(item));
@@ -351,11 +394,10 @@ function getDecisionCardHtml(apiClient, item) {
     const imageStyle = imageUrl ? ` style="--vc-home-v2-card:url('${escapeAttribute(imageUrl)}')"` : '';
     const url = appRouter.getRouteUrl(item);
     const action = progress > 0 ? ItemAction.Resume : ItemAction.Play;
-    const positionTicksData = item.UserData?.PlaybackPositionTicks ? ` data-positionticks="${item.UserData.PlaybackPositionTicks}"` : '';
 
     return `
-        <article class="vcHomeV2DecisionCard" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}"${positionTicksData}>
-            <a is="emby-linkbutton" href="${url}" class="vcHomeV2DecisionImage itemAction" data-action="${ItemAction.Link}" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}"${imageStyle}>
+        <article class="vcHomeV2DecisionCard" ${itemAttributes}>
+            <a is="emby-linkbutton" href="${url}" class="vcHomeV2DecisionImage itemAction" data-action="${ItemAction.Link}" ${itemAttributes}${imageStyle}>
                 <span class="vcHomeV2DecisionBadge">${reason}</span>
                 ${progress > 0 ? `<span class="vcHomeV2DecisionProgress"><span style="width:${progress}%"></span></span>` : ''}
             </a>
@@ -363,8 +405,8 @@ function getDecisionCardHtml(apiClient, item) {
                 <b>${title}</b>
                 <small>${subtitle}</small>
                 <div class="vcHomeV2DecisionActions">
-                    <button is="emby-button" type="button" class="vcHomeV2TinyPlay itemAction" data-action="${action}" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}"${positionTicksData}>▶</button>
-                    <a is="emby-linkbutton" href="${url}" class="vcHomeV2TinyLink itemAction" data-action="${ItemAction.Link}" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}">Detalhes</a>
+                    <button is="emby-button" type="button" class="vcHomeV2TinyPlay itemAction" data-action="${action}" ${itemAttributes}>▶</button>
+                    <a is="emby-linkbutton" href="${url}" class="vcHomeV2TinyLink itemAction" data-action="${ItemAction.Link}" ${itemAttributes}>Detalhes</a>
                 </div>
             </div>
         </article>`;
@@ -390,9 +432,14 @@ function getDecisionSubtitle(item) {
 }
 
 function getDecisionReason(item) {
-    if (item.UserData?.PlaybackPositionTicks) return 'Continuar';
-    if (item.Type === 'Episode') return 'A seguir';
-    return 'Novo';
+    const remaining = getRemainingText(item);
+    if (remaining) return remaining;
+
+    if (item.VcReason === 'Novo no servidor') return 'Recém adicionado';
+    if (item.Type === 'Episode') return 'Novo episódio';
+    if (item.Type === 'Series') return 'Nova temporada';
+
+    return item.VcReason || 'Novo';
 }
 
 function loadUtilitySection(elem, apiClient, user, userViews) {
@@ -406,19 +453,18 @@ function loadUtilitySection(elem, apiClient, user, userViews) {
             <section class="vcHomeV2MoodPanel">
                 <div class="vcHomeV2PanelHead">
                     <h2 class="sectionTitle sectionTitle-cards">Escolher por clima</h2>
-                    <p>Atalhos para quando você sabe o tipo de noite, não o título.</p>
                 </div>
                 <div class="vcHomeV2MoodGrid">
                     <button type="button" class="vcHomeV2MoodCard" data-vc-filter-shortcut="short"><span>◷</span><b>Rápido</b><small>Até 30 min</small></button>
                     <button type="button" class="vcHomeV2MoodCard" data-vc-filter-shortcut="movie"><span>▰</span><b>Filme</b><small>Uma escolha fechada</small></button>
                     <button type="button" class="vcHomeV2MoodCard" data-vc-filter-shortcut="marathon"><span>∞</span><b>Maratona</b><small>Séries e episódios</small></button>
+                    <button type="button" class="vcHomeV2MoodCard" data-vc-filter-shortcut="now"><span>☾</span><b>Sombrio</b><small>Suspense e anime dark</small></button>
                     <button type="button" class="vcHomeV2MoodCard" data-vc-filter-shortcut="now"><span>✦</span><b>Novidades</b><small>Fila completa</small></button>
                 </div>
             </section>
             <aside class="vcHomeV2ServerPanel">
                 <div class="vcHomeV2PanelHead">
                     <h2 class="sectionTitle sectionTitle-cards">${escapeHtml(serverName)}</h2>
-                    <p>Servidor separado da experiência de assistir.</p>
                 </div>
                 <div class="vcHomeV2ServerStats">
                     <div><span>Bibliotecas</span><b>${userViews.length}</b></div>
@@ -442,6 +488,7 @@ function loadHero(elem, apiClient, user) {
     ])
         .then(([resumeItems, nextUpItems, latestItems]) => {
             const heroItem = resumeItems[0] || nextUpItems[0] || latestItems[0];
+            currentHeroItemId = heroItem?.Id || heroItem?.ItemId || null;
             const suggestions = dedupeItems([
                 ...resumeItems.slice(1),
                 ...nextUpItems,
@@ -467,7 +514,7 @@ function renderHero(elem, apiClient, item, suggestions = []) {
     const url = appRouter.getRouteUrl(item);
     const backdropUrl = getHeroImageUrl(apiClient, item);
     const style = backdropUrl ? ` style="--vc-home-v2-backdrop:url('${escapeAttribute(backdropUrl)}')"` : '';
-    const positionTicksData = item.UserData?.PlaybackPositionTicks ? ` data-positionticks="${item.UserData.PlaybackPositionTicks}"` : '';
+    const itemAttributes = getItemActionAttributes(item, item.ServerId || apiClient.serverId());
 
     elem.innerHTML = `
         <section class="vcHomeV2HeroShell"${style}>
@@ -482,8 +529,8 @@ function renderHero(elem, apiClient, item, suggestions = []) {
                 </div>
                 <div class="vcHomeV2Progress"><span style="width:${progress}%"></span></div>
                 <div class="vcHomeV2Actions">
-                    <button is="emby-button" type="button" class="raised button-submit vcHomeV2Primary itemAction" data-action="${ItemAction.Resume}" data-id="${item.Id}" data-serverid="${item.ServerId || apiClient.serverId()}" data-type="${item.Type}"${positionTicksData}>▶ Continuar</button>
-                    <a is="emby-linkbutton" href="${url}" class="raised vcHomeV2Secondary itemAction" data-action="${ItemAction.Link}" data-id="${item.Id}" data-serverid="${item.ServerId || apiClient.serverId()}" data-type="${item.Type}">Detalhes</a>
+                    <button is="emby-button" type="button" class="raised button-submit vcHomeV2Primary itemAction" data-action="${ItemAction.Resume}" ${itemAttributes}>▶ Continuar</button>
+                    <a is="emby-linkbutton" href="${url}" class="raised vcHomeV2Secondary itemAction" data-action="${ItemAction.Link}" ${itemAttributes}>Detalhes</a>
                     <button is="emby-button" type="button" class="raised vcHomeV2Secondary" data-vc-scroll="decision">Ver opções</button>
                 </div>
             </div>
@@ -503,14 +550,42 @@ function getHeroSuggestionsHtml(apiClient, suggestions) {
         const url = appRouter.getRouteUrl(item);
         const imageUrl = getHeroImageUrl(apiClient, item);
         const imageStyle = imageUrl ? ` style="--vc-home-v2-mini:url('${escapeAttribute(imageUrl)}')"` : '';
-        const subtitle = item.SeriesName || item.Type || 'Jellyfin';
+        const subtitle = getHeroSuggestionSubtitle(item);
+        const metric = getHeroSuggestionMetric(item);
+        const itemAttributes = getItemActionAttributes(item, item.ServerId || apiClient.serverId());
 
         return `
-            <a is="emby-linkbutton" href="${url}" class="vcHomeV2NextItem itemAction" data-action="${ItemAction.Link}" data-id="${item.Id}" data-serverid="${item.ServerId || apiClient.serverId()}" data-type="${item.Type}">
+            <a is="emby-linkbutton" href="${url}" class="vcHomeV2NextItem itemAction" data-action="${ItemAction.Link}" ${itemAttributes}>
                 <span class="vcHomeV2MiniThumb"${imageStyle}></span>
-                <span><b>${escapeHtml(item.Name || '')}</b><small>${escapeHtml(subtitle)}</small></span>
+                <span class="vcHomeV2NextItemText"><b>${escapeHtml(item.Name || '')}</b><small>${escapeHtml(subtitle)}</small></span>
+                <strong class="vcHomeV2NextMetric">${escapeHtml(metric)}</strong>
             </a>`;
     }).join('');
+}
+
+function getHeroSuggestionSubtitle(item) {
+    const remaining = getRemainingText(item);
+    if (remaining) return remaining;
+
+    if (item.Type === 'Episode') {
+        const episode = [item.SeasonName, item.IndexNumber ? `E${item.IndexNumber}` : null].filter(Boolean).join(' • ');
+        return episode || item.SeriesName || 'Próximo episódio';
+    }
+
+    if (item.Type === 'Series') return 'Nova temporada';
+    if (item.DateCreated) return 'Recém adicionado';
+
+    return item.SeriesName || item.Type || 'Jellyfin';
+}
+
+function getHeroSuggestionMetric(item) {
+    const progress = getProgressPercent(item);
+    if (progress > 0) return `${Math.round(progress)}%`;
+
+    if (item.Type === 'Episode') return 'Novo';
+    if (item.Type === 'Series') return 'Temporada';
+
+    return 'Novo';
 }
 
 function getEmptyHeroHtml() {
@@ -580,7 +655,28 @@ function getRemainingText(item) {
 }
 
 function escapeAttribute(value) {
-    return value.replace(/'/g, '%27').replace(/\)/g, '%29');
+    return String(value).replace(/'/g, '%27').replace(/\)/g, '%29');
+}
+
+function getItemActionAttributes(item, serverId) {
+    const id = item.Id || item.ItemId;
+    const mediaType = item.MediaType || (['Movie', 'Episode', 'Video'].includes(item.Type) ? 'Video' : '');
+    const positionTicks = item.UserData?.PlaybackPositionTicks || 0;
+    const attrs = [
+        `data-id="${escapeAttribute(id || '')}"`,
+        `data-serverid="${escapeAttribute(serverId || item.ServerId || '')}"`,
+        `data-type="${escapeAttribute(item.Type || '')}"`,
+        `data-mediatype="${escapeAttribute(mediaType)}"`,
+        `data-isfolder="${item.IsFolder === true}"`,
+        `data-positionticks="${positionTicks}"`
+    ];
+
+    if (item.ChannelId) attrs.push(`data-channelid="${escapeAttribute(item.ChannelId)}"`);
+    if (item.CollectionType) attrs.push(`data-collectiontype="${escapeAttribute(item.CollectionType)}"`);
+    if (item.SeriesId) attrs.push(`data-seriesid="${escapeAttribute(item.SeriesId)}"`);
+    if (item.Path) attrs.push(`data-path="${escapeAttribute(item.Path)}"`);
+
+    return attrs.join(' ');
 }
 
 function dedupeItems(items) {
@@ -669,18 +765,18 @@ function loadNextUpV2(elem, apiClient, user, options) {
         <div class="vcHomeV2SectionHead padded-left padded-right">
             <div>
                 <h2 class="sectionTitle sectionTitle-cards">A seguir</h2>
-                <p>Próximos episódios priorizados para continuar séries sem pensar.</p>
             </div>
             <a is="emby-linkbutton" href="${appRouter.getRouteUrl('nextup', { serverId: apiClient.serverId() })}" class="raised vcHomeV2SeeAll">Ver tudo</a>
         </div>
-        <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true">
+        <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true" data-scrollbuttons="false">
             <div is="emby-itemscontainer" class="itemsContainer vcHomeV2NextRail scrollSlider focuscontainer-x" data-monitor="videoplayback,markplayed"></div>
         </div>`;
 
     const itemsContainer = elem.querySelector('.itemsContainer');
     if (!itemsContainer) return;
 
-    itemsContainer.fetchData = () => getNextUpItems(apiClient, user, options.enableOverflow ? 18 : 8);
+    itemsContainer.fetchData = () => getNextUpItems(apiClient, user, options.enableOverflow ? 18 : 8)
+        .then(items => toggleSectionByItems(elem, filterOutHomeDuplicates(items)));
     itemsContainer.getItemsHtml = items => getNextUpCardsHtml(apiClient, items);
     itemsContainer.parentContainer = elem;
 }
@@ -690,8 +786,8 @@ function getNextUpCardsHtml(apiClient, items) {
 }
 
 function getNextUpCardHtml(apiClient, item) {
-    const id = item.Id || item.ItemId;
     const serverId = item.ServerId || apiClient.serverId();
+    const itemAttributes = getItemActionAttributes(item, serverId);
     const title = escapeHtml(item.SeriesName || item.Name || '');
     const subtitle = escapeHtml(getDecisionSubtitle(item));
     const imageUrl = getHeroImageUrl(apiClient, item);
@@ -699,8 +795,8 @@ function getNextUpCardHtml(apiClient, item) {
     const url = appRouter.getRouteUrl(item);
 
     return `
-        <article class="vcHomeV2NextCard" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}">
-            <a is="emby-linkbutton" href="${url}" class="vcHomeV2NextImage itemAction" data-action="${ItemAction.Play}" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}"${imageStyle}>
+        <article class="vcHomeV2NextCard" ${itemAttributes}>
+            <a is="emby-linkbutton" href="${url}" class="vcHomeV2NextImage itemAction" data-action="${ItemAction.Play}" ${itemAttributes}${imageStyle}>
                 <span class="vcHomeV2DecisionBadge">A seguir</span>
                 <span class="vcHomeV2ResumePlay">▶</span>
             </a>
@@ -729,16 +825,16 @@ function loadRecentlyAddedV2(elem, apiClient, user, userViews, options) {
             <div class="vcHomeV2SectionHead padded-left padded-right">
                 <div>
                     <h2 class="sectionTitle sectionTitle-cards">${escapeHtml(view.Name)} recentes</h2>
-                    <p>Adicionados recentemente nesta biblioteca.</p>
                 </div>
                 <a is="emby-linkbutton" href="${appRouter.getRouteUrl(view, { section: 'latest' })}" class="raised vcHomeV2SeeAll">Ver biblioteca</a>
             </div>
-            <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true">
+            <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true" data-scrollbuttons="false">
                 <div is="emby-itemscontainer" class="itemsContainer vcHomeV2LatestRail scrollSlider focuscontainer-x"></div>
             </div>`;
 
         const itemsContainer = section.querySelector('.itemsContainer');
-        itemsContainer.fetchData = () => getLatestItems(apiClient, user, options.enableOverflow ? 18 : 8, view.Id);
+        itemsContainer.fetchData = () => getLatestItems(apiClient, user, options.enableOverflow ? 18 : 8, view.Id)
+            .then(items => toggleSectionByItems(section, filterOutHomeDuplicates(items)));
         itemsContainer.getItemsHtml = items => getLatestCardsHtml(apiClient, items, view);
         itemsContainer.parentContainer = section;
         elem.appendChild(section);
@@ -750,18 +846,21 @@ function getLatestCardsHtml(apiClient, items, view) {
 }
 
 function getLatestCardHtml(apiClient, item, view) {
-    const id = item.Id || item.ItemId;
     const serverId = item.ServerId || apiClient.serverId();
+    const itemAttributes = getItemActionAttributes(item, serverId);
     const title = escapeHtml(item.Name || '');
     const subtitle = escapeHtml(getLatestSubtitle(item));
     const imageUrl = getLatestImageUrl(apiClient, item, view);
     const imageStyle = imageUrl ? ` style="--vc-home-v2-latest:url('${escapeAttribute(imageUrl)}')"` : '';
     const url = appRouter.getRouteUrl(item);
-    const cardClass = view.CollectionType === 'movies' || view.CollectionType === 'tvshows' ? ' vcHomeV2LatestCard-portrait' : '';
+    const cardClass = item.Type === 'Movie'
+        || item.Type === 'Series'
+        || view.CollectionType === 'movies'
+        || view.CollectionType === 'tvshows' ? ' vcHomeV2LatestCard-portrait' : '';
 
     return `
-        <article class="vcHomeV2LatestCard${cardClass}" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}">
-            <a is="emby-linkbutton" href="${url}" class="vcHomeV2LatestImage itemAction" data-action="${ItemAction.Link}" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}"${imageStyle}></a>
+        <article class="vcHomeV2LatestCard${cardClass}" ${itemAttributes}>
+            <a is="emby-linkbutton" href="${url}" class="vcHomeV2LatestImage itemAction" data-action="${ItemAction.Link}" ${itemAttributes}${imageStyle}></a>
             <div class="vcHomeV2LatestBody">
                 <b>${title}</b>
                 <small>${subtitle}</small>
@@ -776,12 +875,17 @@ function getLatestSubtitle(item) {
 }
 
 function getLatestImageUrl(apiClient, item, view) {
-    const usePrimary = view.CollectionType === 'movies' || view.CollectionType === 'tvshows';
+    const usePrimary = item.Type === 'Movie'
+        || item.Type === 'Series'
+        || view.CollectionType === 'movies'
+        || view.CollectionType === 'tvshows';
 
-    if (usePrimary && item.PrimaryImageTag) {
+    const primaryImageTag = item.ImageTags?.Primary || item.PrimaryImageTag;
+
+    if (usePrimary && primaryImageTag) {
         return apiClient.getScaledImageUrl(item.Id, {
             type: 'Primary',
-            tag: item.PrimaryImageTag,
+            tag: primaryImageTag,
             maxWidth: 600
         });
     }
@@ -801,7 +905,6 @@ function loadLibraryV2(elem, userViews) {
         <div class="vcHomeV2SectionHead padded-left padded-right">
             <div>
                 <h2 class="sectionTitle sectionTitle-cards">Minha mídia</h2>
-                <p>Bibliotecas rápidas, sem competir com o próximo play.</p>
             </div>
         </div>
         <div class="vcHomeV2LibraryGrid padded-left padded-right">
@@ -859,17 +962,17 @@ function loadResumeV2(elem, apiClient, user, options) {
         <div class="vcHomeV2SectionHead padded-left padded-right">
             <div>
                 <h2 class="sectionTitle sectionTitle-cards">Continuar assistindo</h2>
-                <p>Retome rápido com progresso, tempo restante e ação direta.</p>
             </div>
         </div>
-        <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true">
+        <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true" data-scrollbuttons="false">
             <div is="emby-itemscontainer" class="itemsContainer vcHomeV2ResumeRail scrollSlider focuscontainer-x" data-monitor="videoplayback,markplayed"></div>
         </div>`;
 
     const itemsContainer = elem.querySelector('.itemsContainer');
     if (!itemsContainer) return;
 
-    itemsContainer.fetchData = () => getResumeItems(apiClient, user, options.enableOverflow ? 12 : 6);
+    itemsContainer.fetchData = () => getResumeItems(apiClient, user, options.enableOverflow ? 12 : 6)
+        .then(items => toggleSectionByItems(elem, filterOutHomeDuplicates(items)));
     itemsContainer.getItemsHtml = items => getResumeCardsHtml(apiClient, items);
     itemsContainer.parentContainer = elem;
 }
@@ -879,19 +982,18 @@ function getResumeCardsHtml(apiClient, items) {
 }
 
 function getResumeCardHtml(apiClient, item) {
-    const id = item.Id || item.ItemId;
     const serverId = item.ServerId || apiClient.serverId();
+    const itemAttributes = getItemActionAttributes(item, serverId);
     const title = escapeHtml(item.SeriesName || item.Name || '');
     const subtitle = escapeHtml(getResumeSubtitle(item));
     const progress = getProgressPercent(item);
     const imageUrl = getHeroImageUrl(apiClient, item);
     const imageStyle = imageUrl ? ` style="--vc-home-v2-resume:url('${escapeAttribute(imageUrl)}')"` : '';
     const url = appRouter.getRouteUrl(item);
-    const positionTicksData = item.UserData?.PlaybackPositionTicks ? ` data-positionticks="${item.UserData.PlaybackPositionTicks}"` : '';
 
     return `
-        <article class="vcHomeV2ResumeCard" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}"${positionTicksData}>
-            <a is="emby-linkbutton" href="${url}" class="vcHomeV2ResumeImage itemAction" data-action="${ItemAction.Resume}" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}"${positionTicksData}${imageStyle}>
+        <article class="vcHomeV2ResumeCard" ${itemAttributes}>
+            <a is="emby-linkbutton" href="${url}" class="vcHomeV2ResumeImage itemAction" data-action="${ItemAction.Resume}" ${itemAttributes}${imageStyle}>
                 <span class="vcHomeV2ResumePlay">▶</span>
                 <span class="vcHomeV2ResumeProgress"><span style="width:${progress}%"></span></span>
             </a>
@@ -899,8 +1001,8 @@ function getResumeCardHtml(apiClient, item) {
                 <b>${title}</b>
                 <small>${subtitle}</small>
                 <div class="vcHomeV2ResumeActions">
-                    <button is="emby-button" type="button" class="vcHomeV2ResumePrimary itemAction" data-action="${ItemAction.Resume}" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}"${positionTicksData}>Continuar</button>
-                    <a is="emby-linkbutton" href="${url}" class="vcHomeV2ResumeSecondary itemAction" data-action="${ItemAction.Link}" data-id="${id}" data-serverid="${serverId}" data-type="${item.Type}">Detalhes</a>
+                    <button is="emby-button" type="button" class="vcHomeV2ResumePrimary itemAction" data-action="${ItemAction.Resume}" ${itemAttributes}>Continuar</button>
+                    <a is="emby-linkbutton" href="${url}" class="vcHomeV2ResumeSecondary itemAction" data-action="${ItemAction.Link}" ${itemAttributes}>Detalhes</a>
                 </div>
             </div>
         </article>`;

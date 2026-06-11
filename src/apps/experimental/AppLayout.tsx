@@ -23,6 +23,7 @@ export const Component = () => {
     const isMediumScreen = useMediaQuery((t: Theme) => t.breakpoints.up('md'));
     const isDrawerAvailable = isDrawerPath(location.pathname) && Boolean(user) && !isMediumScreen;
     const isDrawerOpen = isDrawerActive && isDrawerAvailable;
+    const isHomePath = location.pathname === '/home';
 
     const onToggleDrawer = useCallback(() => {
         setIsDrawerActive(!isDrawerActive);
@@ -39,16 +40,18 @@ export const Component = () => {
                 }}
             >
                 <StrictMode>
-                    <OffsetAppBar dense elevation={4}>
-                        <AppToolbar
-                            isDrawerAvailable={!isMediumScreen && isDrawerAvailable}
-                            isDrawerOpen={isDrawerOpen}
-                            onDrawerButtonClick={onToggleDrawer}
-                        />
-                    </OffsetAppBar>
+                    {!isHomePath && (
+                        <OffsetAppBar dense elevation={4}>
+                            <AppToolbar
+                                isDrawerAvailable={!isMediumScreen && isDrawerAvailable}
+                                isDrawerOpen={isDrawerOpen}
+                                onDrawerButtonClick={onToggleDrawer}
+                            />
+                        </OffsetAppBar>
+                    )}
 
                     {
-                        isDrawerAvailable && (
+                        !isHomePath && isDrawerAvailable && (
                             <AppDrawer
                                 open={isDrawerOpen}
                                 onClose={onToggleDrawer}

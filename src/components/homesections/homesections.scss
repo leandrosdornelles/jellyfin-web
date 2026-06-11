@@ -33,13 +33,17 @@
     padding-top: 1em;
 }
 
+.homeSectionsContainer > .verticalSection:not(.vcHomeV2Hero):not(.vcHomeV2Command):not(.vcHomeV2QuickFilters) {
+    margin-top: 0.9rem;
+}
+
 .vcHomeV2Sidebar {
     position: fixed;
     z-index: 1200;
     top: 0;
     bottom: 0;
     left: 0;
-    width: 5.25rem;
+    width: 6.25rem;
     padding: 1.1rem 0.75rem;
     border-right: 1px solid rgba(255, 255, 255, 0.08);
     background: color-mix(in srgb, #070a0f 86%, transparent);
@@ -112,28 +116,46 @@
     color: var(--vc-home-text) !important;
 }
 
+.vcHomeV2SidebarButton:focus-visible,
+.vcHomeV2DecisionCard:focus-within,
+.vcHomeV2ResumeCard:focus-within,
+.vcHomeV2NextCard:focus-within,
+.vcHomeV2LatestCard:focus-within,
+.vcHomeV2LibraryCard:focus-visible,
+.vcHomeV2MoodCard:focus-visible,
+.vcHomeV2SeeAll:focus-visible,
+.vcHomeV2TinyPlay:focus-visible,
+.vcHomeV2TinyLink:focus-visible,
+.vcHomeV2ResumePrimary:focus-visible,
+.vcHomeV2ResumeSecondary:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--vc-home-accent) 76%, transparent);
+    outline-offset: 3px;
+}
+
 .vcHomeV2SidebarButton .material-icons {
     font-size: 1.25rem;
 }
 
 @media all and (min-width: 50.001em) {
-    .vcHomeV2Active .skinHeader .headerLeft,
-    .vcHomeV2Active .skinHeader .headerTabs {
+    .skinHeader.vcHomeV2HideHeader {
         display: none !important;
     }
 
-    .vcHomeV2Active .skinHeader .headerTop {
-        justify-content: flex-end;
+    .vcHomeV2Active .homePage {
+        padding-top: 0 !important;
     }
 
     .vcHomeV2Active .skinHeader {
-        background: linear-gradient(180deg, rgba(7, 10, 15, 0.72), transparent) !important;
-        border-bottom: 0 !important;
-        box-shadow: none !important;
+        display: none !important;
     }
 
     .vcHomeV2Active .homeSectionsContainer {
-        margin-left: 5.25rem;
+        margin-left: 6.25rem;
+        padding-right: 1.5rem;
+    }
+
+    .vcHomeV2Active .vcHomeV2Command {
+        margin-top: 0.4rem;
     }
 }
 
@@ -143,8 +165,24 @@
 
 .vcHomeV2Command {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
     margin-bottom: 0.75rem !important;
+}
+
+.vcHomeV2Command::before {
+    content: 'NAS online';
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--vc-home-border);
+    border-radius: 999px;
+    background: rgba(18, 24, 34, 0.52);
+    color: var(--vc-home-muted);
+    font-size: 0.82rem;
+    font-weight: 800;
 }
 
 .vcHomeV2CommandLink {
@@ -165,6 +203,7 @@
 .vcHomeV2CommandLink:focus-visible {
     border-color: color-mix(in srgb, var(--vc-home-accent) 48%, var(--vc-home-border));
     color: var(--vc-home-text) !important;
+    outline: 0;
 }
 
 .vcHomeV2CommandLink span:not(.material-icons) {
@@ -297,7 +336,10 @@
     min-height: 3.3rem;
     padding: 0 1.35rem !important;
     border-radius: 999px !important;
+    align-items: center;
+    justify-content: center;
     font-weight: 800;
+    line-height: 1;
 }
 
 .vcHomeV2Secondary {
@@ -328,7 +370,7 @@
 
 .vcHomeV2NextItem {
     display: grid !important;
-    grid-template-columns: 4.5rem minmax(0, 1fr);
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto;
     gap: 0.75rem;
     align-items: center;
     padding: 0.55rem;
@@ -337,6 +379,20 @@
     background: rgba(255, 255, 255, 0.08);
     color: #fff !important;
     text-decoration: none;
+}
+
+.vcHomeV2NextItemText {
+    min-width: 0;
+}
+
+.vcHomeV2NextMetric {
+    padding: 0.32rem 0.48rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--vc-home-accent-2);
+    font-size: 0.72rem;
+    font-weight: 900;
+    white-space: nowrap;
 }
 
 .vcHomeV2NextItem:hover {
@@ -371,7 +427,7 @@
 }
 
 .vcHomeV2Decision {
-    margin-bottom: 0.4rem;
+    margin-bottom: 1.15rem;
 }
 
 .vcHomeV2SectionHead {
@@ -379,6 +435,21 @@
     align-items: end;
     justify-content: space-between;
     gap: 1rem;
+    min-height: 3rem;
+    margin-bottom: 0.85rem;
+    position: relative;
+}
+
+.vcHomeV2SectionHead::before {
+    content: '';
+    position: absolute;
+    left: 3.3%;
+    bottom: -0.55rem;
+    width: 2.35rem;
+    height: 0.12rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--vc-home-accent), var(--vc-home-accent-2));
+    opacity: 0.55;
 }
 
 .vcHomeV2SectionHead h2 {
@@ -393,12 +464,27 @@
 
 .vcHomeV2SeeAll {
     flex-shrink: 0;
-    padding: 0.65rem 1rem !important;
+    align-self: center;
+    padding: 0.7rem 1rem !important;
     border: 1px solid var(--vc-home-border) !important;
     border-radius: 999px !important;
     background: var(--vc-home-surface) !important;
     color: var(--vc-home-text) !important;
+    font-weight: 800;
+    line-height: 1;
     text-decoration: none;
+}
+
+.vcHomeV2SeeAll::before,
+.vcHomeV2SeeAll::after {
+    content: none !important;
+}
+
+.vcHomeV2SectionHead + .emby-scroller-container .emby-scrollbuttons,
+.vcHomeV2SectionHead + .emby-scroller-container .emby-scrollbuttons-button,
+.vcHomeV2Decision .emby-scrollbuttons,
+.vcHomeV2LatestSection .emby-scrollbuttons {
+    display: none !important;
 }
 
 .vcHomeV2DecisionRail .cardBox {
@@ -406,19 +492,87 @@
 }
 
 .vcHomeV2DecisionRail {
-    gap: 1rem;
+    gap: 1.15rem;
     align-items: stretch;
 }
 
+.vcHomeV2DecisionRail,
+.vcHomeV2ResumeRail,
+.vcHomeV2NextRail,
+.vcHomeV2LatestRail {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.vcHomeV2DecisionRail::-webkit-scrollbar,
+.vcHomeV2ResumeRail::-webkit-scrollbar,
+.vcHomeV2NextRail::-webkit-scrollbar,
+.vcHomeV2LatestRail::-webkit-scrollbar {
+    display: none;
+}
+
+.vcHomeV2Decision .emby-scroller,
+.vcHomeV2LatestSection .emby-scroller,
+.verticalSection:has(.vcHomeV2ResumeRail) .emby-scroller,
+.verticalSection:has(.vcHomeV2NextRail) .emby-scroller {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.vcHomeV2Decision .emby-scroller::-webkit-scrollbar,
+.vcHomeV2LatestSection .emby-scroller::-webkit-scrollbar,
+.verticalSection:has(.vcHomeV2ResumeRail) .emby-scroller::-webkit-scrollbar,
+.verticalSection:has(.vcHomeV2NextRail) .emby-scroller::-webkit-scrollbar {
+    display: none;
+}
+
+.vcHomeV2Decision .emby-scroller,
+.vcHomeV2LatestSection .emby-scroller,
+.vcHomeV2ResumeRail,
+.vcHomeV2NextRail,
+.vcHomeV2LatestRail {
+    position: relative;
+}
+
+.vcHomeV2Decision .emby-scroller::after,
+.vcHomeV2LatestSection .emby-scroller::after,
+.verticalSection:has(.vcHomeV2ResumeRail) .emby-scroller::after,
+.verticalSection:has(.vcHomeV2NextRail) .emby-scroller::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    width: min(8rem, 12vw);
+    background: linear-gradient(90deg, transparent, var(--vc-home-bg) 88%);
+    pointer-events: none;
+}
+
 .vcHomeV2DecisionCard {
-    width: clamp(16rem, 22vw, 24rem);
+    width: clamp(20rem, 27vw, 31rem);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 1.3rem;
     background: rgba(18, 24, 34, 0.68);
     overflow: hidden;
     isolation: isolate;
     scroll-snap-align: start;
+    position: relative;
     transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vcHomeV2DecisionCard::after,
+.vcHomeV2ResumeCard::after,
+.vcHomeV2NextCard::after,
+.vcHomeV2LatestCard::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    border: 1px solid transparent;
+    border-radius: inherit;
+    pointer-events: none;
+    transition: border-color 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vcHomeV2ResumeRail {
@@ -434,27 +588,43 @@
     overflow: hidden;
     isolation: isolate;
     scroll-snap-align: start;
+    position: relative;
     transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vcHomeV2ResumeCard:hover,
 .vcHomeV2ResumeCard:focus-within {
-    transform: translateY(-0.25rem);
+    transform: none;
     border-color: color-mix(in srgb, var(--vc-home-accent) 52%, var(--vc-home-border));
     background: rgba(24, 32, 45, 0.9);
+    box-shadow: 0 1rem 2.8rem rgba(0, 0, 0, 0.28);
 }
 
 .vcHomeV2ResumeImage {
     position: relative;
     display: grid !important;
     aspect-ratio: 16 / 9;
+    margin: -1px -1px 0;
     border-radius: 1.35rem 1.35rem 0 0;
     background-clip: padding-box;
     overflow: hidden;
     place-items: center;
     background: var(--vc-home-v2-resume, linear-gradient(135deg, var(--vc-home-accent), var(--vc-home-accent-2))) center / cover;
     text-decoration: none;
-    transform: translateZ(0);
+    transform: translateZ(0) scale(1);
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), filter 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vcHomeV2ResumeCard:hover .vcHomeV2ResumeImage,
+.vcHomeV2ResumeCard:focus-within .vcHomeV2ResumeImage,
+.vcHomeV2DecisionCard:hover .vcHomeV2DecisionImage,
+.vcHomeV2DecisionCard:focus-within .vcHomeV2DecisionImage,
+.vcHomeV2NextCard:hover .vcHomeV2NextImage,
+.vcHomeV2NextCard:focus-within .vcHomeV2NextImage,
+.vcHomeV2LatestCard:hover .vcHomeV2LatestImage,
+.vcHomeV2LatestCard:focus-within .vcHomeV2LatestImage {
+    filter: saturate(1.06) contrast(1.03);
+    transform: translateZ(0) scale(1.018);
 }
 
 .vcHomeV2ResumeImage::after {
@@ -476,7 +646,9 @@
     backdrop-filter: blur(12px);
     color: #fff;
     font-size: 1.1rem;
+    line-height: 1;
     place-items: center;
+    text-align: center;
     transform: translateY(0.35rem);
 }
 
@@ -534,8 +706,11 @@
 .vcHomeV2ResumeSecondary {
     min-height: 2.15rem !important;
     border-radius: 999px !important;
+    align-items: center;
+    justify-content: center;
     font-size: 0.82rem;
     font-weight: 800;
+    line-height: 1;
 }
 
 .vcHomeV2ResumePrimary {
@@ -554,17 +729,18 @@
 
 .vcHomeV2NextRail,
 .vcHomeV2LatestRail {
-    gap: 1rem;
+    gap: 1.15rem;
     align-items: stretch;
 }
 
 .vcHomeV2NextCard {
-    width: clamp(18rem, 25vw, 28rem);
+    width: clamp(22rem, 30vw, 36rem);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 1.25rem;
     background: rgba(18, 24, 34, 0.66);
     overflow: hidden;
     isolation: isolate;
+    position: relative;
     transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -572,21 +748,24 @@
 .vcHomeV2NextCard:focus-within,
 .vcHomeV2LatestCard:hover,
 .vcHomeV2LatestCard:focus-within {
-    transform: translateY(-0.22rem);
+    transform: none;
     border-color: color-mix(in srgb, var(--vc-home-accent) 52%, var(--vc-home-border));
+    box-shadow: 0 1rem 2.8rem rgba(0, 0, 0, 0.26);
 }
 
 .vcHomeV2NextImage {
     position: relative;
     display: grid !important;
     aspect-ratio: 16 / 9;
+    margin: -1px -1px 0;
     border-radius: 1.25rem 1.25rem 0 0;
     background-clip: padding-box;
     overflow: hidden;
     background: var(--vc-home-v2-next, linear-gradient(135deg, var(--vc-home-accent), var(--vc-home-accent-2))) center / cover;
     place-items: center;
     text-decoration: none;
-    transform: translateZ(0);
+    transform: translateZ(0) scale(1);
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), filter 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vcHomeV2NextImage::after {
@@ -600,7 +779,7 @@
 .vcHomeV2LatestBody {
     display: grid;
     gap: 0.2rem;
-    padding: 0.75rem;
+    padding: 0.9rem;
     text-align: center;
 }
 
@@ -617,22 +796,23 @@
 .vcHomeV2NextBody b,
 .vcHomeV2LatestBody b {
     color: var(--vc-home-text);
-    font-size: 0.92rem;
+    font-size: 1rem;
 }
 
 .vcHomeV2NextBody small,
 .vcHomeV2LatestBody small {
     color: var(--vc-home-muted);
-    font-size: 0.78rem;
+    font-size: 0.84rem;
 }
 
 .vcHomeV2LatestCard {
-    width: clamp(13rem, 17vw, 18rem);
+    width: clamp(18rem, 22vw, 25rem);
     border: 1px solid transparent;
     border-radius: 1.1rem;
     background: rgba(18, 24, 34, 0.42);
     overflow: hidden;
     isolation: isolate;
+    position: relative;
     transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -644,16 +824,18 @@
 .vcHomeV2LatestImage {
     display: block !important;
     aspect-ratio: 16 / 9;
+    margin: -1px -1px 0;
     border-radius: 1.1rem 1.1rem 0 0;
     background: var(--vc-home-v2-latest, linear-gradient(135deg, var(--vc-home-accent), var(--vc-home-accent-2))) center / cover;
     background-clip: padding-box;
     overflow: hidden;
     text-decoration: none;
-    transform: translateZ(0);
+    transform: translateZ(0) scale(1);
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), filter 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vcHomeV2LatestCard-portrait {
-    width: clamp(10rem, 12vw, 13rem);
+    width: clamp(13rem, 15.5vw, 17rem);
 }
 
 .vcHomeV2LatestCard-portrait .vcHomeV2LatestImage {
@@ -662,21 +844,35 @@
 
 .vcHomeV2DecisionCard:hover,
 .vcHomeV2DecisionCard:focus-within {
-    transform: translateY(-0.25rem);
+    transform: none;
     border-color: color-mix(in srgb, var(--vc-home-accent) 52%, var(--vc-home-border));
     background: rgba(24, 32, 45, 0.86);
+    box-shadow: 0 1rem 2.8rem rgba(0, 0, 0, 0.28);
+}
+
+.vcHomeV2DecisionCard:hover::after,
+.vcHomeV2DecisionCard:focus-within::after,
+.vcHomeV2ResumeCard:hover::after,
+.vcHomeV2ResumeCard:focus-within::after,
+.vcHomeV2NextCard:hover::after,
+.vcHomeV2NextCard:focus-within::after,
+.vcHomeV2LatestCard:hover::after,
+.vcHomeV2LatestCard:focus-within::after {
+    border-color: color-mix(in srgb, var(--vc-home-accent) 52%, var(--vc-home-border));
 }
 
 .vcHomeV2DecisionImage {
     position: relative;
     display: block !important;
     aspect-ratio: 16 / 9;
+    margin: -1px -1px 0;
     border-radius: 1.3rem 1.3rem 0 0;
     background: var(--vc-home-v2-card, linear-gradient(135deg, var(--vc-home-accent), var(--vc-home-accent-2))) center / cover;
     background-clip: padding-box;
     overflow: hidden;
     text-decoration: none;
-    transform: translateZ(0);
+    transform: translateZ(0) scale(1);
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), filter 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vcHomeV2DecisionImage::after {
@@ -728,7 +924,7 @@
 .vcHomeV2DecisionBody {
     display: grid;
     gap: 0.35rem;
-    padding: 0.85rem;
+    padding: 1rem 1rem 1.05rem;
 }
 
 .vcHomeV2DecisionBody b,
@@ -741,13 +937,13 @@
 
 .vcHomeV2DecisionBody b {
     color: var(--vc-home-text);
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     line-height: 1.2;
 }
 
 .vcHomeV2DecisionBody small {
     color: var(--vc-home-muted);
-    font-size: 0.78rem;
+    font-size: 0.86rem;
 }
 
 .vcHomeV2DecisionActions {
@@ -759,16 +955,25 @@
 
 .vcHomeV2TinyPlay,
 .vcHomeV2TinyLink {
+    display: inline-grid !important;
     min-height: 2rem !important;
+    align-items: center;
+    justify-content: center;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 999px !important;
     background: rgba(255, 255, 255, 0.08) !important;
     color: var(--vc-home-text) !important;
+    line-height: 1;
+    text-align: center;
 }
 
 .vcHomeV2TinyPlay {
+    min-width: 2rem !important;
     width: 2rem;
+    height: 2rem;
     padding: 0 !important;
+    font-size: 0.92rem;
+    place-items: center;
 }
 
 .vcHomeV2TinyLink {
@@ -780,12 +985,15 @@
 .vcHomeV2Utility {
     margin-top: 0.8rem;
     margin-bottom: 2rem !important;
+    padding-top: 1.4rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
 }
 
 .vcHomeV2LibraryGrid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.9rem;
+    padding-top: 0.75rem;
 }
 
 .vcHomeV2LibraryCard {
@@ -869,7 +1077,7 @@
 
 .vcHomeV2MoodGrid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.8rem;
 }
 
@@ -884,11 +1092,28 @@
     transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.vcHomeV2MoodCard:nth-child(2) {
+    background: radial-gradient(circle at 20% 0, rgba(125, 180, 255, 0.24), transparent 40%), rgba(255, 255, 255, 0.055);
+}
+
+.vcHomeV2MoodCard:nth-child(3) {
+    background: radial-gradient(circle at 20% 0, rgba(168, 85, 247, 0.22), transparent 40%), rgba(255, 255, 255, 0.055);
+}
+
+.vcHomeV2MoodCard:nth-child(4) {
+    background: radial-gradient(circle at 20% 0, rgba(15, 23, 42, 0.55), transparent 42%), rgba(255, 255, 255, 0.055);
+}
+
+.vcHomeV2MoodCard:nth-child(5) {
+    background: radial-gradient(circle at 20% 0, rgba(251, 191, 36, 0.18), transparent 42%), rgba(255, 255, 255, 0.055);
+}
+
 .vcHomeV2MoodCard:hover,
 .vcHomeV2MoodCard:focus-visible {
     transform: translateY(-0.2rem);
     border-color: color-mix(in srgb, var(--vc-home-accent) 55%, var(--vc-home-border));
     background: radial-gradient(circle at 20% 0, rgba(125, 180, 255, 0.28), transparent 42%), rgba(255, 255, 255, 0.08);
+    outline: 0;
 }
 
 .vcHomeV2MoodCard span,
@@ -997,24 +1222,70 @@
 @media all and (max-width: 50em) {
     .homeSectionsContainer {
         padding-top: 0.7em;
+        padding-bottom: 5.8rem;
     }
 
     .vcHomeV2Sidebar {
-        display: none;
+        position: fixed;
+        top: auto;
+        right: 0.75rem;
+        bottom: 0.75rem;
+        left: 0.75rem;
+        z-index: 1200;
+        width: auto;
+        height: 4.4rem;
+        padding: 0.45rem;
+        border: 1px solid var(--vc-home-border);
+        border-radius: 1.5rem;
+        background: color-mix(in srgb, #070a0f 86%, transparent);
+        backdrop-filter: blur(22px);
+        display: block;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.36);
+    }
+
+    .vcHomeV2SidebarLogo,
+    .vcHomeV2SidebarNav:last-child,
+    .vcHomeV2SidebarNav .vcHomeV2SidebarButton:nth-child(n+6) {
+        display: none !important;
+    }
+
+    .vcHomeV2SidebarNav:first-of-type {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.25rem;
+        height: 100%;
+        align-items: center;
+    }
+
+    .vcHomeV2SidebarButton {
+        width: 100%;
+        height: 3.45rem;
+        border-radius: 1.05rem;
     }
 
     .vcHomeV2Hero {
-        margin: 0 1rem 1.4rem;
+        margin: 0 0.75rem 1.4rem;
     }
 
     .vcHomeV2HeroShell {
-        min-height: 29rem;
-        padding: 1.35rem;
+        min-height: 30rem;
+        padding: 1.15rem;
         border-radius: 1.6rem;
     }
 
     .vcHomeV2HeroContent h1 {
-        font-size: clamp(3rem, 16vw, 4.8rem);
+        max-width: 9ch;
+        font-size: clamp(2.8rem, 15vw, 4.2rem);
+    }
+
+    .vcHomeV2Actions {
+        gap: 0.55rem;
+    }
+
+    .vcHomeV2Primary,
+    .vcHomeV2Secondary {
+        min-height: 3rem;
+        padding: 0 1rem !important;
     }
 
     .vcHomeV2HeroPanel {
@@ -1024,24 +1295,46 @@
     .vcHomeV2SectionHead {
         align-items: start;
         flex-direction: column;
+        gap: 0.6rem;
     }
 
-    .vcHomeV2DecisionCard {
-        width: 78vw;
+    .vcHomeV2DecisionRail > .vcHomeV2DecisionCard {
+        width: 86vw !important;
+        min-width: 86vw !important;
+        max-width: 86vw !important;
+        flex: 0 0 86vw !important;
     }
 
-    .vcHomeV2ResumeCard {
-        width: 84vw;
+    .vcHomeV2ResumeRail > .vcHomeV2ResumeCard {
+        width: 84vw !important;
+        min-width: 84vw !important;
+        max-width: 84vw !important;
+        flex: 0 0 84vw !important;
     }
 
-    .vcHomeV2NextCard,
-    .vcHomeV2LatestCard,
-    .vcHomeV2LatestCard-portrait {
-        width: 72vw;
+    .vcHomeV2NextRail > .vcHomeV2NextCard {
+        width: 84vw !important;
+        min-width: 84vw !important;
+        max-width: 84vw !important;
+        flex: 0 0 84vw !important;
+    }
+
+    .vcHomeV2LatestRail > .vcHomeV2LatestCard {
+        width: 72vw !important;
+        min-width: 72vw !important;
+        max-width: 72vw !important;
+        flex: 0 0 72vw !important;
+    }
+
+    .vcHomeV2LatestRail > .vcHomeV2LatestCard-portrait {
+        width: 42vw !important;
+        min-width: 42vw !important;
+        max-width: 42vw !important;
+        flex: 0 0 42vw !important;
     }
 
     .vcHomeV2LatestCard-portrait .vcHomeV2LatestImage {
-        aspect-ratio: 16 / 10;
+        aspect-ratio: 2 / 3;
     }
 
     .vcHomeV2UtilityGrid,
@@ -1052,5 +1345,120 @@
 
     .vcHomeV2MoodCard {
         min-height: 6.5rem;
+    }
+
+    .vcHomeV2Command {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        padding: 0 0.75rem;
+    }
+
+    .vcHomeV2Command::before {
+        min-height: 3.1rem;
+        padding: 0 0.8rem;
+        content: 'NAS\A online';
+        white-space: pre-line;
+        text-align: center;
+    }
+
+    .vcHomeV2CommandLink {
+        min-width: 0;
+    }
+
+    .vcHomeV2CommandLink kbd {
+        display: none;
+    }
+}
+
+@media all and (min-width: 50.001em) {
+    html.vcHomeV2Active .skinHeader,
+    body.vcHomeV2Active .skinHeader,
+    body:has(.vcHomeV2Sidebar) .skinHeader,
+    .skinHeader.vcHomeV2HideHeader,
+    body.vcHomeV2Active .headerTabs,
+    body.vcHomeV2Active .sectionTabs,
+    body.vcHomeV2Active .tabs-viewmenubar,
+    body.vcHomeV2Active .emby-tabs-slider,
+    body.vcHomeV2Active .vcHomeV2OfficialTab,
+    .vcHomeV2Page .headerTabs,
+    .vcHomeV2Page .sectionTabs,
+    .vcHomeV2Page .tabs-viewmenubar,
+    .vcHomeV2Page .emby-tabs-slider {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+    }
+
+    html.vcHomeV2Active .homePage,
+    body.vcHomeV2Active .homePage,
+    body:has(.vcHomeV2Sidebar) .homePage,
+    .homePage.vcHomeV2Page,
+    .libraryPage.vcHomeV2Page,
+    .libraryPage.vcHomeV2Page:not(.noSecondaryNavPage),
+    .pageWithAbsoluteTabs.vcHomeV2Page:not(.noSecondaryNavPage) {
+        padding-top: 0 !important;
+    }
+
+    .homePage.vcHomeV2Page .pageTabContent,
+    .homePage.vcHomeV2Page .absolutePageTabContent,
+    body.vcHomeV2Active .homePage .pageTabContent,
+    body.vcHomeV2Active .homePage .absolutePageTabContent {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        margin: 0 !important;
+    }
+
+    body.vcHomeV2Active.withSectionTabs .headerTop,
+    body.vcHomeV2Active .headerTop,
+    body.vcHomeV2Active .headerLeft,
+    body.vcHomeV2Active .pageTitle,
+    body.vcHomeV2Active .skinHeader .lnkMediaFolder,
+    body.vcHomeV2Active .skinHeader .navMenuOption,
+    body.vcHomeV2Active .mainDrawer:not(.vcHomeV2Sidebar) .lnkMediaFolder,
+    body.vcHomeV2Active .mainDrawer:not(.vcHomeV2Sidebar) .navMenuOption,
+    body:has(.vcHomeV2Sidebar) .skinHeader .lnkMediaFolder,
+    body:has(.vcHomeV2Sidebar) .skinHeader .navMenuOption {
+        display: none !important;
+    }
+
+    body:has(.vcHomeV2Sidebar) .homeSectionsContainer {
+        margin-left: 6.25rem !important;
+        padding-top: 0 !important;
+    }
+
+    .vcHomeV2DecisionRail > .vcHomeV2DecisionCard {
+        width: clamp(22rem, 30vw, 34rem) !important;
+        min-width: clamp(22rem, 30vw, 34rem) !important;
+        max-width: clamp(22rem, 30vw, 34rem) !important;
+        flex: 0 0 clamp(22rem, 30vw, 34rem) !important;
+    }
+
+    .vcHomeV2NextRail > .vcHomeV2NextCard {
+        width: clamp(24rem, 34vw, 40rem) !important;
+        min-width: clamp(24rem, 34vw, 40rem) !important;
+        max-width: clamp(24rem, 34vw, 40rem) !important;
+        flex: 0 0 clamp(24rem, 34vw, 40rem) !important;
+    }
+
+    .vcHomeV2LatestRail > .vcHomeV2LatestCard {
+        width: clamp(20rem, 25vw, 28rem) !important;
+        min-width: clamp(20rem, 25vw, 28rem) !important;
+        max-width: clamp(20rem, 25vw, 28rem) !important;
+        flex: 0 0 clamp(20rem, 25vw, 28rem) !important;
+    }
+
+    .vcHomeV2LatestRail > .vcHomeV2LatestCard-portrait {
+        width: clamp(14rem, 18vw, 20rem) !important;
+        min-width: clamp(14rem, 18vw, 20rem) !important;
+        max-width: clamp(14rem, 18vw, 20rem) !important;
+        flex: 0 0 clamp(14rem, 18vw, 20rem) !important;
     }
 }

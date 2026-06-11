@@ -12,26 +12,43 @@ class HomeView extends TabbedView {
 
     onPause() {
         super.onPause(this);
-        document.querySelector('.skinHeader').classList.remove('noHomeButtonHeader');
+        this.view?.classList.remove('vcHomeV2Page', 'noSecondaryNavPage');
+        const skinHeader = document.querySelector('.skinHeader');
+        skinHeader?.classList.remove('noHomeButtonHeader');
+        skinHeader?.classList.remove('vcHomeV2HideHeader');
+        skinHeader?.style.removeProperty('display');
         document.body.classList.remove('vcHomeV2Active');
+        document.body.classList.remove('hiddenViewMenuBar');
+        document.documentElement.classList.remove('vcHomeV2Active');
     }
 
     onResume(options) {
         super.onResume(this, options);
-        document.querySelector('.skinHeader').classList.add('noHomeButtonHeader');
+        this.view?.classList.add('vcHomeV2Page', 'noSecondaryNavPage');
+        LibraryMenu.setTabs(null);
+        const skinHeader = document.querySelector('.skinHeader');
+        skinHeader?.classList.add('noHomeButtonHeader');
+        skinHeader?.classList.add('vcHomeV2HideHeader');
+        skinHeader?.style.setProperty('display', 'none', 'important');
         document.body.classList.add('vcHomeV2Active');
-    }
-
-    getDefaultTabIndex() {
-        return 0;
+        document.body.classList.add('hiddenViewMenuBar');
+        document.body.classList.remove('withSectionTabs');
+        document.documentElement.classList.add('vcHomeV2Active');
+        hideOfficialHomeNavigation();
     }
 
     getTabs() {
         return [{
-            name: globalize.translate('Home')
+            name: globalize.translate('Home'),
+            cssClass: 'vcHomeV2OfficialTab'
         }, {
-            name: globalize.translate('Favorites')
+            name: globalize.translate('Favorites'),
+            cssClass: 'vcHomeV2OfficialTab'
         }];
+    }
+
+    getDefaultTabIndex() {
+        return 0;
     }
 
     getTabController(index) {
@@ -62,6 +79,15 @@ class HomeView extends TabbedView {
             return controller;
         });
     }
+}
+
+function hideOfficialHomeNavigation() {
+    const skinHeader = document.querySelector('.skinHeader');
+    skinHeader?.classList.add('vcHomeV2HideHeader');
+    skinHeader?.style.setProperty('display', 'none', 'important');
+
+    document.querySelector('.headerTabs')?.classList.add('hide');
+    document.querySelector('.tabs-viewmenubar')?.classList.add('hide');
 }
 
 export default HomeView;

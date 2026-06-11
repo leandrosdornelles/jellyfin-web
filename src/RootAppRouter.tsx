@@ -51,6 +51,7 @@ function RootAppLayout() {
     const location = useLocation();
     const isNewLayoutPath = Object.values(DASHBOARD_APP_PATHS)
         .some(path => location.pathname.startsWith(`/${path}`));
+    const isHomePath = location.pathname === '/home';
 
     return (
         <ThemeProvider
@@ -59,7 +60,7 @@ function RootAppLayout() {
             storageManager={ThemeStorageManager}
         >
             <Backdrop />
-            <AppHeader isHidden={isExperimentalLayout || isNewLayoutPath} />
+            <AppHeader isHidden={isExperimentalLayout || isNewLayoutPath || isHomePath} />
 
             <Outlet />
         </ThemeProvider>
