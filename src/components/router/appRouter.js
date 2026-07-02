@@ -6,8 +6,6 @@ import itemHelper from '../itemHelper';
 import loading from '../loading/loading';
 import alert from '../alert';
 
-import layoutManager from 'components/layoutManager';
-import { LayoutMode } from 'constants/layoutMode';
 import { getItemQuery } from 'hooks/useItem';
 import { ServerConnections } from 'lib/jellyfin-apiclient';
 import { toApi } from 'utils/jellyfin-apiclient/compat';
@@ -407,7 +405,7 @@ class AppRouter {
             return url;
         }
 
-        const isExperimentalLayout = layoutManager.layout === LayoutMode.Experimental;
+        const isExperimentalLayout = true;
 
         if (context !== 'folders' && !itemHelper.isLocalItem(item)) {
 

@@ -13,20 +13,18 @@ import { STABLE_APP_ROUTES } from 'apps/stable/routes/routes';
 import { WIZARD_APP_ROUTES } from 'apps/wizard/routes/routes';
 import AppHeader from 'components/AppHeader';
 import Backdrop from 'components/Backdrop';
-import layoutManager from 'components/layoutManager';
 import BangRedirect from 'components/router/BangRedirect';
 import { createRouterHistory } from 'components/router/routerHistory';
-import { LayoutMode } from 'constants/layoutMode';
 import appTheme from 'themes';
 import { ThemeStorageManager } from 'themes/themeStorageManager';
 
-const isExperimentalLayout = layoutManager.layout === LayoutMode.Experimental;
+const isNewLayout = true;
 
 const router = createHashRouter([
     {
         element: <RootAppLayout />,
         children: [
-            ...(isExperimentalLayout ? EXPERIMENTAL_APP_ROUTES : STABLE_APP_ROUTES),
+            ...(isNewLayout ? EXPERIMENTAL_APP_ROUTES : STABLE_APP_ROUTES),
             ...DASHBOARD_APP_ROUTES,
             ...WIZARD_APP_ROUTES,
             {
@@ -60,7 +58,7 @@ function RootAppLayout() {
             storageManager={ThemeStorageManager}
         >
             <Backdrop />
-            <AppHeader isHidden={isExperimentalLayout || isNewLayoutPath || isHomePath} />
+            <AppHeader isHidden={isNewLayout || isNewLayoutPath || isHomePath} />
 
             <Outlet />
         </ThemeProvider>
