@@ -1,0 +1,165 @@
+.cinePersonBody {
+    display: flex;
+    min-height: 80vh;
+    background: var(--cine-bg);
+    color: var(--cine-muted);
+}
+
+.cinePersonContent {
+    position: relative;
+    min-width: 0;
+    flex: 1;
+}
+
+.cinePersonHero {
+    min-height: 52vh;
+}
+
+.cinePersonHero .cineHeroArt {
+    filter: blur(18px) saturate(0.75);
+    opacity: 0.42;
+}
+
+.cinePersonSpot {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(420px circle at 32% 42%, var(--cine-accent-soft), transparent 70%);
+    pointer-events: none;
+}
+
+.cinePersonHeroInner {
+    position: relative;
+    min-height: 52vh;
+    display: flex;
+    align-items: flex-end;
+    gap: 2rem;
+    padding: 6rem 2.5rem 2.5rem;
+}
+
+.cinePersonPortraitWrap {
+    position: relative;
+    display: none;
+    flex: 0 0 auto;
+}
+
+.cinePersonPortraitGlow {
+    position: absolute;
+    inset: -1.5rem;
+    border-radius: 999px;
+    background: var(--cine-accent-glow);
+    filter: blur(44px);
+    opacity: 0.45;
+    animation: cineAmbient 6s ease-in-out infinite;
+}
+
+.cinePersonPortrait {
+    position: relative;
+    width: 11rem;
+    height: 11rem;
+    border: 1px solid var(--cine-border);
+    border-radius: 999px;
+    background: var(--cine-person-image, linear-gradient(135deg, #374151, #1c1917));
+    background-position: center;
+    background-size: cover;
+    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.8);
+}
+
+.cinePersonHeroText {
+    max-width: 42rem;
+}
+
+.cinePersonTitle {
+    margin: 0 0 0.55rem;
+    color: var(--cine-text);
+    font-size: clamp(3rem, 5vw, 4.8rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.cinePersonMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin: 0 0 1rem;
+    color: var(--cine-text-soft);
+    font-size: 0.875rem;
+}
+
+.cinePersonMeta b {
+    color: var(--cine-text);
+    font-weight: 600;
+}
+
+.cinePersonLinks {
+    margin-top: 1.25rem;
+}
+
+.cinePersonContentInner {
+    position: relative;
+    z-index: 2;
+    padding: 2.5rem 0 0;
+}
+
+.cinePersonSectionHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+
+.cinePersonSectionHead .cineDetailSectionTitle {
+    margin: 0;
+}
+
+.cinePersonSectionHead span {
+    color: var(--cine-muted-2);
+    font-size: 0.75rem;
+}
+
+.cinePersonGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.8rem 1.25rem;
+}
+
+.cinePersonTilt .cineCard {
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .cinePersonGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 768px) {
+    .cinePersonPortraitWrap {
+        display: block;
+    }
+}
+
+@media (min-width: 1100px) {
+    .cinePersonGrid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .cinePersonBody {
+        display: block;
+    }
+
+    .cinePersonBody .cineSidebar {
+        display: none;
+    }
+
+    .cinePersonHeroInner {
+        padding: 5rem 1.25rem 2rem;
+    }
+
+    .cinePersonContentInner {
+        padding-top: 1.5rem;
+    }
+}

@@ -1,0 +1,531 @@
+.cineLibraryBody {
+    display: flex;
+    min-height: 80vh;
+    background: var(--cine-bg);
+    color: var(--cine-muted);
+}
+
+.cineLibraryContent {
+    min-width: 0;
+    flex: 1;
+}
+
+.cineLibraryHeader {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid var(--cine-border);
+    background: rgba(9, 9, 11, 0.85);
+    backdrop-filter: blur(16px);
+}
+
+.cineLibraryTitleBlock {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+}
+
+.cineLibraryTitleBlock h1 {
+    margin: 0;
+    color: var(--cine-text);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.cineLibraryTitleBlock span {
+    padding: 0.3rem 0.65rem;
+    border: 1px solid var(--cine-border-soft);
+    border-radius: 999px;
+    background: rgba(39, 39, 42, 0.7);
+    color: var(--cine-muted);
+    font-size: 0.75rem;
+}
+
+.cineLibraryHeader {
+    display: grid;
+    gap: 1rem;
+}
+
+.cineLibraryControls {
+    position: absolute;
+    top: 1.25rem;
+    right: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.cineLibrarySearch {
+    display: flex;
+    width: 14rem;
+    height: 2.25rem;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--cine-border-soft);
+    border-radius: 0.5rem;
+    background: rgba(39, 39, 42, 0.8);
+    color: var(--cine-muted-2);
+}
+
+.cineLibrarySearch input {
+    min-width: 0;
+    flex: 1;
+    border: 0;
+    background: transparent;
+    color: var(--cine-text-soft);
+    font: inherit;
+    font-size: 0.875rem;
+    outline: 0;
+}
+
+.cineLibrarySearch input::placeholder {
+    color: var(--cine-muted-2);
+}
+
+.cineLibraryControls > button,
+.cineLibraryFilters button {
+    border: 1px solid var(--cine-border-soft);
+    background: rgba(39, 39, 42, 0.8);
+    color: var(--cine-text-soft);
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.cineLibraryControls > button {
+    padding: 0.6rem 0.95rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.cineLibraryControls > button:hover,
+.cineLibraryControls > button:focus-visible,
+.cineLibraryFilters button:hover,
+.cineLibraryFilters button:focus-visible {
+    border-color: rgba(34, 211, 238, 0.4);
+    color: var(--cine-accent);
+    outline: 0;
+}
+
+.cineLibraryFilters {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cineLibraryFilters button {
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.cineLibraryFilters button.is-active {
+    border-color: rgba(34, 211, 238, 0.4);
+    background: rgba(6, 182, 212, 0.15);
+    color: var(--cine-accent);
+}
+
+.cineLibraryState {
+    padding: 4rem 2rem;
+    color: var(--cine-muted);
+    text-align: center;
+}
+
+.cineLibraryHero {
+    position: relative;
+    height: 27.5rem;
+    overflow: hidden;
+    border-bottom: 1px solid var(--cine-border);
+    background: var(--cine-library-hero-image, linear-gradient(135deg, #0c4a6e, #3b0764)) center / cover;
+}
+
+.cineLibraryHero::before,
+.cineLibraryHero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.cineLibraryHero::before {
+    background: linear-gradient(90deg, #000, rgba(0, 0, 0, 0.7), transparent);
+}
+
+.cineLibraryHero::after {
+    background: linear-gradient(0deg, var(--cine-bg), transparent 55%);
+}
+
+.cineLibraryHeroContent {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    height: 100%;
+    max-width: 42rem;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2.5rem;
+}
+
+.cineLibraryHeroContent > span {
+    width: fit-content;
+    margin-bottom: 0.75rem;
+    color: var(--cine-accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.cineLibraryHeroContent h2 {
+    margin: 0 0 0.75rem;
+    color: #fff;
+    font-size: clamp(2.4rem, 4vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.cineLibraryHeroMeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    color: var(--cine-text-soft);
+    font-size: 0.875rem;
+}
+
+.cineLibraryHeroMeta b {
+    color: var(--cine-accent);
+}
+
+.cineLibraryHeroMeta small {
+    padding: 0.18rem 0.45rem;
+    border-radius: 0.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cine-text);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.cineLibraryHeroContent p {
+    display: -webkit-box;
+    max-width: 40rem;
+    margin: 0 0 1.5rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    color: var(--cine-text-soft);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    overflow: hidden;
+}
+
+.cineLibraryHeroActions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.cineLibraryHeroActions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1.5rem;
+    border-radius: 0.5rem;
+    color: #000;
+    background: var(--cine-accent);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.cineLibraryHeroActions a + a {
+    border: 1px solid var(--cine-border-soft);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cine-text);
+    backdrop-filter: blur(8px);
+}
+
+.cineLibraryTracks {
+    padding: 2rem 0 1rem;
+}
+
+.cineLibraryTrack {
+    margin-bottom: 2.5rem;
+}
+
+.cineLibraryTrackHead {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding: 0 2rem;
+}
+
+.cineLibraryTrackHead h2 {
+    margin: 0;
+    color: var(--cine-text);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+}
+
+.cineLibraryTrackScroller {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 0 2rem 0.75rem;
+    mask-image: linear-gradient(to right, black 90%, transparent);
+    scrollbar-width: none;
+}
+
+.cineLibraryTrackScroller::-webkit-scrollbar {
+    display: none;
+}
+
+.cineLibraryCard {
+    flex: 0 0 10rem;
+    min-width: 0;
+}
+
+.cineLibraryCardLink {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.cineLibraryPoster {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--cine-border-soft);
+    border-radius: 0.75rem;
+    background: var(--cine-library-card-image, linear-gradient(135deg, #0f172a, #334155)) center / cover;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.cineLibraryCard:hover .cineLibraryPoster,
+.cineLibraryCard:focus-within .cineLibraryPoster {
+    transform: translateY(-0.25rem);
+    border-color: rgba(34, 211, 238, 0.7);
+    box-shadow: 0 18px 50px -12px rgba(34, 211, 238, 0.5);
+}
+
+.cineLibraryQuality {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 2;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--cine-text);
+    font-size: 0.58rem;
+    font-weight: 700;
+}
+
+.cineLibraryHover {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 3rem 0.75rem 0.75rem;
+    background: linear-gradient(0deg, #000, rgba(0, 0, 0, 0.86), transparent);
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.cineLibraryCard:hover .cineLibraryHover,
+.cineLibraryCard:focus-within .cineLibraryHover {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.cineLibraryHoverMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+    color: var(--cine-text-soft);
+    font-size: 0.62rem;
+}
+
+.cineLibraryRating {
+    color: var(--cine-accent);
+    font-weight: 700;
+}
+
+.cineLibraryHover p {
+    display: -webkit-box;
+    margin: 0 0 0.5rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    color: var(--cine-muted);
+    font-size: 0.62rem;
+    line-height: 1.35;
+    overflow: hidden;
+}
+
+.cineLibraryGenreRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.6rem;
+}
+
+.cineLibraryGenreRow span {
+    padding: 0.15rem 0.35rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cine-text-soft);
+    font-size: 0.55rem;
+}
+
+.cineLibraryHoverActions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cineLibraryHoverActions span,
+.cineLibraryHoverActions b {
+    display: grid;
+    height: 2rem;
+    place-items: center;
+    border-radius: 0.5rem;
+}
+
+.cineLibraryHoverActions span {
+    flex: 1;
+    background: var(--cine-accent);
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.cineLibraryHoverActions b {
+    width: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cine-text);
+}
+
+.cineLibraryProgress {
+    height: 0.25rem;
+    margin: -0.25rem 0 0.5rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.cineLibraryProgress span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--cine-accent);
+}
+
+.cineLibraryCard h3 {
+    margin: 0;
+    color: var(--cine-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cineLibraryCard p {
+    margin: 0.2rem 0 0;
+    color: var(--cine-muted-2);
+    font-size: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cineLibraryGridShell {
+    display: flex;
+    gap: 1rem;
+    padding: 2rem;
+}
+
+.cineLibraryGrid {
+    display: grid;
+    min-width: 0;
+    flex: 1;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: 2rem 1.25rem;
+}
+
+.cineLibraryAlphabet {
+    position: sticky;
+    top: 7rem;
+    display: flex;
+    max-height: 80vh;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: 0.1rem;
+    overflow-y: auto;
+}
+
+.cineLibraryAlphabet button {
+    border: 0;
+    background: transparent;
+    color: #52525b;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: color 0.2s ease;
+}
+
+.cineLibraryAlphabet button:hover,
+.cineLibraryAlphabet button:focus-visible,
+.cineLibraryAlphabet button.is-active {
+    color: var(--cine-accent);
+    outline: 0;
+}
+
+@media (max-width: 60em) {
+    .cineLibraryControls {
+        position: static;
+        flex-wrap: wrap;
+    }
+
+    .cineLibrarySearch {
+        width: min(100%, 22rem);
+    }
+
+    .cineLibraryHero {
+        height: 24rem;
+    }
+
+    .cineLibraryHeroContent,
+    .cineLibraryTrackHead,
+    .cineLibraryTrackScroller,
+    .cineLibraryGridShell,
+    .cineLibraryHeader {
+        padding-right: 1rem;
+        padding-left: 1rem;
+    }
+}
+
+@media (max-width: 50em) {
+    .cineLibraryBody {
+        display: block;
+        padding-bottom: 5.5rem;
+    }
+
+    .cineLibraryContent {
+        margin-left: 0;
+    }
+
+    .cineLibraryGridShell {
+        display: block;
+    }
+
+    .cineLibraryAlphabet {
+        display: none;
+    }
+}

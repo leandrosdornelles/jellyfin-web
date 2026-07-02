@@ -2,7 +2,7 @@ import { AsyncRoute } from 'components/router/AsyncRoute';
 import { AppType } from 'constants/appType';
 
 export const ASYNC_USER_ROUTES: AsyncRoute[] = [
-    { path: 'home', type: AppType.Experimental },
+    { path: 'home', page: 'home', type: AppType.Experimental },
     { path: 'homevideos', type: AppType.Experimental },
     { path: 'livetv', type: AppType.Experimental },
     { path: 'movies', type: AppType.Experimental },
@@ -17,5 +17,6 @@ export const ASYNC_USER_ROUTES: AsyncRoute[] = [
     { path: 'quickconnect', page: 'quickConnect' },
     { path: 'search' },
     { path: 'tv', page: 'shows', type: AppType.Experimental },
-    { path: 'userprofile', page: 'user/userprofile' }
+    { path: 'userprofile', page: 'user/userprofile' },
+    { path: 'cinedetails', page: 'cinedetails', type: AppType.Experimental }
 ];

@@ -2,12 +2,6 @@ import { LegacyRoute } from '../../../../components/router/LegacyRoute';
 
 export const LEGACY_USER_ROUTES: LegacyRoute[] = [
     {
-        path: 'details',
-        pageProps: {
-            controller: 'itemDetails/index',
-            view: 'itemDetails/index.html'
-        }
-    }, {
         path: 'list',
         pageProps: {
             controller: 'list',
@@ -85,12 +79,6 @@ export const LEGACY_USER_ROUTES: LegacyRoute[] = [
             isFullscreen: true,
             isNowPlayingBarEnabled: false,
             isThemeMediaSupported: true
-        }
-    }, {
-        path: 'home',
-        pageProps: {
-            controller: 'home',
-            view: 'home.html'
         }
     }, {
         path: 'movies',

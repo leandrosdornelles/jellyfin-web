@@ -15,6 +15,13 @@ import AppDrawer, { isDrawerPath } from './components/drawers/AppDrawer';
 
 import './AppOverrides.scss';
 
+const CINEMATIC_PATHS = new Set([
+    '/home',
+    '/movies',
+    '/tv',
+    '/cinedetails'
+]);
+
 export const Component = () => {
     const [ isDrawerActive, setIsDrawerActive ] = useState(false);
     const { user } = useApi();
@@ -23,7 +30,7 @@ export const Component = () => {
     const isMediumScreen = useMediaQuery((t: Theme) => t.breakpoints.up('md'));
     const isDrawerAvailable = isDrawerPath(location.pathname) && Boolean(user) && !isMediumScreen;
     const isDrawerOpen = isDrawerActive && isDrawerAvailable;
-    const isHomePath = location.pathname === '/home';
+    const isCinematicPath = CINEMATIC_PATHS.has(location.pathname);
 
     const onToggleDrawer = useCallback(() => {
         setIsDrawerActive(!isDrawerActive);
@@ -40,7 +47,7 @@ export const Component = () => {
                 }}
             >
                 <StrictMode>
-                    {!isHomePath && (
+                    {!isCinematicPath && (
                         <OffsetAppBar dense elevation={4}>
                             <AppToolbar
                                 isDrawerAvailable={!isMediumScreen && isDrawerAvailable}
@@ -51,7 +58,7 @@ export const Component = () => {
                     )}
 
                     {
-                        !isHomePath && isDrawerAvailable && (
+                        !isCinematicPath && isDrawerAvailable && (
                             <AppDrawer
                                 open={isDrawerOpen}
                                 onClose={onToggleDrawer}

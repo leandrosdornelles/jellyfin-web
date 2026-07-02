@@ -1,0 +1,718 @@
+.cineDetailBody {
+    position: relative;
+    display: flex;
+    min-height: 80vh;
+    background: var(--cine-bg);
+    border-radius: 1rem;
+    overflow: hidden;
+    color: var(--cine-muted);
+}
+
+.cineDetailBody > .cineSidebar {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    min-height: 100vh;
+    z-index: 5;
+}
+
+.cineDetailContent {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.cineDetailLoading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 1rem;
+    color: var(--cine-muted);
+    font-size: 0.9rem;
+}
+
+.cineDetailLoadingSpinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: 2px solid color-mix(in srgb, var(--cine-accent) 20%, transparent);
+    border-top-color: var(--cine-accent);
+    animation: cineDetailSpin 0.9s linear infinite;
+}
+
+@keyframes cineDetailSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.cineDetailEmpty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 0.5rem;
+    color: var(--cine-muted);
+    text-align: center;
+    padding: 2rem;
+}
+
+.cineDetailEmpty h2 {
+    margin: 0;
+    color: var(--cine-text);
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.cineDetailEmpty p {
+    margin: 0;
+    color: var(--cine-muted);
+    font-size: 0.95rem;
+}
+
+.cineDetailBackdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.18;
+    filter: blur(40px);
+    pointer-events: none;
+    transform: scale(1.1);
+}
+
+.cineDetailSynopsis {
+    color: var(--cine-muted);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    max-width: 50rem;
+    margin: 0 0 0.5rem;
+    white-space: pre-line;
+}
+
+.cineDetailHeroExtra {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+}
+
+.cineDetailActionsRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.4rem;
+}
+
+.cineDetailTechGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1.25rem;
+}
+
+@media (min-width: 50em) {
+    .cineDetailTechGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.cineDetailSimilarHeader {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.cineDetailSimilarTitle {
+    margin: 0;
+    color: var(--cine-text);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+.cineDetailCastHeader {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.cineDetailCastTitle {
+    margin: 0;
+    color: var(--cine-text);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+.cineDetailBack {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.5rem;
+    z-index: 30;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--cine-border-soft);
+    border-radius: 0.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--cine-muted);
+    font-size: 0.78rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.cineDetailBack:hover,
+.cineDetailBack:focus-visible {
+    color: var(--cine-accent);
+    border-color: var(--cine-accent-glow);
+    outline: 0;
+}
+
+.cineDetailEyebrow {
+    display: inline-block;
+    width: fit-content;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--cine-accent) 18%, transparent);
+    color: var(--cine-accent);
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+}
+
+.cineDetailHeroTitle {
+    margin: 0;
+    color: var(--cine-text);
+    font-size: clamp(3rem, 5vw, 4.7rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    max-width: 16ch;
+}
+
+.cineDetailHeroTitle--episode {
+    font-size: clamp(1.8rem, 3.2vw, 3rem);
+    max-width: 22ch;
+}
+
+.cineDetailTagline {
+    color: color-mix(in srgb, var(--cine-accent) 80%, #fff);
+    font-size: 0.875rem;
+    font-style: italic;
+    margin: 0.65rem 0 0;
+}
+
+.cineDetailHeroSubtitle {
+    color: var(--cine-text-soft);
+    font-size: 0.9rem;
+    margin: 0.4rem 0 0;
+}
+
+.cineDetailMeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--cine-text-soft);
+    font-size: 0.85rem;
+    margin: 1rem 0 0;
+}
+
+.cineDetailMeta strong {
+    color: var(--cine-text);
+    font-weight: 500;
+}
+
+.cineDetailMetaDot {
+    color: var(--cine-muted-2);
+}
+
+.cineDetailMetaBadge {
+    padding: 0.2rem 0.45rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.3rem;
+    font-size: 0.7rem;
+}
+
+.cineDetailMetaQuality {
+    padding: 0.2rem 0.45rem;
+    border-radius: 0.3rem;
+    background: var(--cine-surface);
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+.cineDetailMetaAmber {
+    color: var(--cine-amber);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.cineDetailMetaRed {
+    color: var(--cine-red);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.cineDetailHeroLayout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 6rem 2.5rem 2.5rem;
+}
+
+.cineDetailHeroLayout--episode {
+    padding-top: 5.5rem;
+    padding-bottom: 2rem;
+}
+
+@media (min-width: 50em) {
+    .cineDetailHeroLayout {
+        flex-direction: row;
+        align-items: end;
+        gap: 2rem;
+    }
+}
+
+.cineDetailHeroBody {
+    flex: 1;
+    min-width: 0;
+}
+
+.cineDetailPoster {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.cineDetailPosterImg {
+    position: relative;
+    width: 13rem;
+    aspect-ratio: 2 / 3;
+    border: 1px solid var(--cine-border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.8);
+    background-size: cover;
+    background-position: center;
+}
+
+.cineDetailPosterGlow {
+    position: absolute;
+    inset: -1.5rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--cine-accent) 30%, transparent);
+    filter: blur(48px);
+    pointer-events: none;
+    animation: cineAmbient 6s ease-in-out infinite;
+}
+
+.cineDetailThumb {
+    position: relative;
+    width: 100%;
+    max-width: 26.25rem;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--cine-border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.8);
+    background-size: cover;
+    background-position: center;
+}
+
+@media (min-width: 50em) {
+    .cineDetailThumb {
+        width: 26.25rem;
+    }
+}
+
+.cineDetailSection {
+    padding: 1.25rem 2.5rem 0;
+}
+
+.cineDetailSectionTitle {
+    margin: 0 0 0.85rem;
+    color: var(--cine-text);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+.cineDetailPanelTitle {
+    margin: 0 0 0.85rem;
+    color: var(--cine-text);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.cineDetailPanel {
+    border: 1px solid var(--cine-border);
+    border-radius: 0.75rem;
+    background: rgba(39, 39, 42, 0.4);
+    padding: 1.25rem;
+    color: var(--cine-text-soft);
+}
+
+.cineDetailPanel + .cineDetailPanel {
+    margin-top: 1.25rem;
+}
+
+.cineDetailSelectLabel {
+    display: block;
+}
+
+.cineDetailSelectLabel + .cineDetailSelectLabel {
+    margin-top: 0.85rem;
+}
+
+.cineDetailSelectCaption {
+    display: block;
+    color: var(--cine-muted);
+    font-size: 0.7rem;
+    margin-bottom: 0.25rem;
+}
+
+.cineDetailSelect {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--cine-border);
+    border-radius: 0.55rem;
+    background: var(--cine-bg);
+    color: var(--cine-text-soft);
+    font-size: 0.85rem;
+    transition: border-color 0.2s ease;
+}
+
+.cineDetailSelect:focus-visible {
+    border-color: color-mix(in srgb, var(--cine-accent) 60%, transparent);
+    outline: 0;
+}
+
+.cineDetailTechLinks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--cine-border-soft);
+}
+
+.cineDetailTechLink {
+    color: var(--cine-accent);
+    background: transparent;
+    border: 0;
+    font-size: 0.72rem;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.cineDetailTechLink:hover,
+.cineDetailTechLink:focus-visible {
+    color: color-mix(in srgb, var(--cine-accent) 75%, #fff);
+    outline: 0;
+}
+
+.cineDetailContentInner {
+    padding-bottom: 3rem;
+    scroll-margin-top: 2rem;
+}
+
+.cineDetailContentGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 0 2.5rem;
+}
+
+.cineDetailContentMain {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.cineDetailContentAside {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+}
+
+@media (min-width: 75em) {
+    .cineDetailContentGrid {
+        grid-template-columns: minmax(0, 1fr) 18.75rem;
+    }
+}
+
+.cineDetailFavButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--cine-border-soft);
+    border-radius: 0.6rem;
+    background: color-mix(in srgb, var(--cine-surface) 80%, transparent);
+    color: var(--cine-text);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.cineDetailFavButton:hover,
+.cineDetailFavButton:focus-visible {
+    border-color: color-mix(in srgb, var(--cine-accent) 40%, var(--cine-border));
+    color: var(--cine-accent);
+    outline: 0;
+}
+
+.cineDetailFavButtonActive {
+    border-color: color-mix(in srgb, var(--cine-accent) 70%, transparent);
+    color: var(--cine-accent);
+    background: color-mix(in srgb, var(--cine-accent) 16%, transparent);
+}
+
+.cineDetailIconButton {
+    display: inline-grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 1px solid var(--cine-border-soft);
+    border-radius: 0.6rem;
+    background: color-mix(in srgb, var(--cine-surface) 80%, transparent);
+    color: var(--cine-text);
+    font-size: 1.05rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.cineDetailIconButton:hover,
+.cineDetailIconButton:focus-visible {
+    border-color: color-mix(in srgb, var(--cine-accent) 40%, var(--cine-border));
+    color: var(--cine-accent);
+    outline: 0;
+}
+
+.cineDetailPrimaryCta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.6rem;
+    border: 0;
+    border-radius: 0.6rem;
+    background: var(--cine-accent);
+    color: var(--cine-cta-text);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.cineDetailPrimaryCta:hover,
+.cineDetailPrimaryCta:focus-visible {
+    background: color-mix(in srgb, var(--cine-accent) 85%, #fff);
+    box-shadow: 0 0 28px -4px var(--cine-accent-glow);
+    outline: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cineDetailLoadingSpinner,
+    .cineDetailPosterGlow,
+    .cineHomeProgress {
+        animation: none !important;
+    }
+}
+
+.cineTiltCast {
+    width: 8rem;
+    display: inline-block;
+}
+
+.cineTiltSimilar {
+    display: inline-block;
+}
+
+.cineTiltSeason {
+    display: inline-block;
+}
+
+.cineTiltSeason .cineCard {
+    width: 10rem;
+}
+
+.cineTiltResume {
+    display: inline-block;
+}
+
+.cineTiltResume .cineCard {
+    width: 18rem;
+}
+
+.cineHomeBody {
+    min-height: 90vh;
+}
+
+.cineHomeHero {
+    min-height: 70vh;
+}
+
+.cineHomeHeroContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    max-width: 38rem;
+    padding: 5rem 2.5rem 2.5rem;
+}
+
+.cineHomeTitle {
+    max-width: 18ch;
+}
+
+.cineHomeEyebrow {
+    display: inline-block;
+    width: fit-content;
+    padding: 0.35rem 0.7rem;
+    border-radius: 0.4rem;
+    background: color-mix(in srgb, var(--cine-accent) 18%, transparent);
+    color: var(--cine-accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+}
+
+.cineHomeMeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--cine-text-soft);
+    font-size: 0.9rem;
+    margin-top: 0.9rem;
+}
+
+.cineHomeProgress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.9rem;
+    max-width: 32rem;
+}
+
+.cineHomeProgressBar {
+    flex: 1;
+    height: 0.32rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.18);
+    overflow: hidden;
+}
+
+.cineHomeProgressBar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--cine-accent), var(--cine-accent-2));
+}
+
+.cineHomeProgressLabel {
+    color: var(--cine-text);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.cineHomeActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.4rem;
+}
+
+.cineDetailHero {
+    min-height: 62vh;
+}
+
+.cineDetailHero--short {
+    min-height: 46vh;
+}
+
+.cineDetailHero--episode {
+    min-height: 58vh;
+}
+
+.cineDetailEpisodeList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.cineDetailEpisodeThumb {
+    position: relative;
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 26.25rem;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--cine-border);
+    border-radius: 0.85rem;
+    overflow: hidden;
+    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.8);
+    background-size: cover;
+    background-position: center;
+}
+
+@media (min-width: 50em) {
+    .cineDetailEpisodeThumb {
+        width: 26.25rem;
+    }
+}
+
+.cineDetailEpisodePlay {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    transition: background 0.2s ease;
+}
+
+.cineDetailEpisodeThumb:hover .cineDetailEpisodePlay {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.cineDetailEpisodePlayBtn {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 9999px;
+    background: var(--cine-accent);
+    color: var(--cine-cta-text);
+    font-size: 1.05rem;
+    box-shadow: 0 0 30px -4px var(--cine-accent-glow);
+    transition: transform 0.2s ease;
+}
+
+.cineDetailEpisodeThumb:hover .cineDetailEpisodePlayBtn {
+    transform: scale(1.06);
+}
+
+.cineTiltSimilar .cineCard {
+    width: 11rem;
+}

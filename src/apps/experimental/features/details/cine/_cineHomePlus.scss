@@ -1,0 +1,177 @@
+.cineTiltCast {
+    width: 8rem;
+    display: inline-block;
+}
+
+.cineTiltSimilar {
+    display: inline-block;
+}
+
+.cineTiltSeason {
+    display: inline-block;
+}
+
+.cineTiltSeason .cineCard {
+    width: 10rem;
+}
+
+.cineTiltResume {
+    display: inline-block;
+}
+
+.cineTiltResume .cineCard {
+    width: 18rem;
+}
+
+.cineHomeBody {
+    min-height: 90vh;
+}
+
+.cineHomeHero {
+    min-height: 70vh;
+}
+
+.cineHomeHeroContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    max-width: 38rem;
+    padding: 5rem 2.5rem 2.5rem;
+}
+
+.cineHomeTitle {
+    max-width: 18ch;
+}
+
+.cineHomeEyebrow {
+    display: inline-block;
+    width: fit-content;
+    padding: 0.35rem 0.7rem;
+    border-radius: 0.4rem;
+    background: color-mix(in srgb, var(--cine-accent) 18%, transparent);
+    color: var(--cine-accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+}
+
+.cineHomeMeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--cine-text-soft);
+    font-size: 0.9rem;
+    margin-top: 0.9rem;
+}
+
+.cineHomeProgress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.9rem;
+    max-width: 32rem;
+}
+
+.cineHomeProgressBar {
+    flex: 1;
+    height: 0.32rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.18);
+    overflow: hidden;
+}
+
+.cineHomeProgressBar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--cine-accent), var(--cine-accent-2));
+}
+
+.cineHomeProgressLabel {
+    color: var(--cine-text);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.cineHomeActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.4rem;
+}
+
+.cineDetailHero {
+    min-height: 62vh;
+}
+
+.cineDetailHero--short {
+    min-height: 46vh;
+}
+
+.cineDetailHero--episode {
+    min-height: 58vh;
+}
+
+.cineDetailEpisodeList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.cineDetailEpisodeThumb {
+    position: relative;
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 26.25rem;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--cine-border);
+    border-radius: 0.85rem;
+    overflow: hidden;
+    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.8);
+    background-size: cover;
+    background-position: center;
+}
+
+@media (min-width: 50em) {
+    .cineDetailEpisodeThumb {
+        width: 26.25rem;
+    }
+}
+
+.cineDetailEpisodePlay {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    transition: background 0.2s ease;
+}
+
+.cineDetailEpisodeThumb:hover .cineDetailEpisodePlay {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.cineDetailEpisodePlayBtn {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 9999px;
+    background: var(--cine-accent);
+    color: var(--cine-cta-text);
+    font-size: 1.05rem;
+    box-shadow: 0 0 30px -4px var(--cine-accent-glow);
+    transition: transform 0.2s ease;
+}
+
+.cineDetailEpisodeThumb:hover .cineDetailEpisodePlayBtn {
+    transform: scale(1.06);
+}
+
+.cineTiltSimilar .cineCard {
+    width: 11rem;
+}

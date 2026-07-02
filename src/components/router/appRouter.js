@@ -90,8 +90,10 @@ class AppRouter {
 
         path = path.replace(this.baseUrl(), '');
 
+        const currentPath = history.location.pathname + history.location.search;
+
         // can't use this with home right now due to the back menu
-        if (history.location.pathname === path && path !== '/home') {
+        if (currentPath === path && path !== '/home') {
             loading.hide();
             return Promise.resolve();
         }
@@ -405,8 +407,9 @@ class AppRouter {
             return url;
         }
 
+        const isExperimentalLayout = layoutManager.layout === LayoutMode.Experimental;
+
         if (context !== 'folders' && !itemHelper.isLocalItem(item)) {
-            const isExperimentalLayout = layoutManager.layout === LayoutMode.Experimental;
 
             if (isExperimentalLayout && item.CollectionType == CollectionType.Books) {
                 url = `#/books?topParentId=${item.Id}&collectionType=${item.CollectionType}`;
@@ -488,7 +491,15 @@ class AppRouter {
         const contextSuffix = context ? '&context=' + context : '';
 
         if (itemType == 'Series' || itemType == 'Season' || itemType == 'Episode') {
+            if (isExperimentalLayout) {
+                return '#/cinedetails?id=' + id + contextSuffix + '&serverId=' + serverId;
+            }
+
             return '#/details?id=' + id + contextSuffix + '&serverId=' + serverId;
+        }
+
+        if (isExperimentalLayout && itemType == 'Movie') {
+            return '#/cinedetails?id=' + id + '&serverId=' + serverId;
         }
 
         if (item.IsFolder) {

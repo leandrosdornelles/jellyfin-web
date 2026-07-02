@@ -1,3 +1,4 @@
+import { CollectionType } from '@jellyfin/sdk/lib/generated-client/models/collection-type';
 import layoutManager from 'components/layoutManager';
 import escapeHtml from 'escape-html';
 import { DEFAULT_SECTIONS, HomeSectionType } from 'constants/homeSectionType';
@@ -25,6 +26,7 @@ import './homesections.scss';
 
 const MAX_SECTIONS = 10;
 const MAX_SECTIONS_TV = MAX_SECTIONS + 1; // TV layout can have an extra section to ensure a library section is always visible
+const ANIME_NAME_PATTERN = /anime|animes/i;
 let searchShortcutBound = false;
 let headerObserverBound = false;
 let currentHeroItemId = null;
@@ -95,16 +97,16 @@ export function loadSections(elem, apiClient, user, userSettings) {
             if (userViews.length) {
                 // TV layout can have an extra section to ensure libraries are visible
                 const totalSectionCount = layoutManager.tv ? MAX_SECTIONS_TV : MAX_SECTIONS;
-                html += getSidebarHtml(apiClient, user, userViews);
+                html += getSidebarHtml(user, userViews);
                 html += '<div class="vcHomeV2Command verticalSection padded-left padded-right">';
                 html += '<a is="emby-linkbutton" href="#/search" class="vcHomeV2CommandLink"><span class="material-icons search" aria-hidden="true"></span><span>Buscar filme, série, anime, pessoa ou gênero</span><kbd>Ctrl K</kbd></a>';
                 html += '</div>';
                 html += '<div class="vcHomeV2Hero verticalSection"></div>';
                 html += '<div class="vcHomeV2QuickFilters verticalSection padded-left padded-right">';
-                html += '<button is="emby-button" type="button" class="raised vcHomeV2Filter is-active" data-vc-filter="now">Agora</button>';
-                html += '<button is="emby-button" type="button" class="raised vcHomeV2Filter" data-vc-filter="short">Até 30 min</button>';
-                html += '<button is="emby-button" type="button" class="raised vcHomeV2Filter" data-vc-filter="movie">Filmes</button>';
-                html += '<button is="emby-button" type="button" class="raised vcHomeV2Filter" data-vc-filter="marathon">Maratonar</button>';
+                html += '<button is="emby-button" type="button" class="vcHomeV2Filter is-active" data-vc-filter="now">Agora</button>';
+                html += '<button is="emby-button" type="button" class="vcHomeV2Filter" data-vc-filter="short">Até 30 min</button>';
+                html += '<button is="emby-button" type="button" class="vcHomeV2Filter" data-vc-filter="movie">Filmes</button>';
+                html += '<button is="emby-button" type="button" class="vcHomeV2Filter" data-vc-filter="marathon">Maratonar</button>';
                 html += '</div>';
                 html += '<div class="vcHomeV2Decision verticalSection"></div>';
                 for (let i = 0; i < totalSectionCount; i++) {
@@ -180,46 +182,34 @@ function bindHeaderObserver() {
     });
 }
 
-function getSidebarHtml(apiClient, user, userViews) {
-    const libraryLinks = userViews
-        .filter(item => item?.Id)
-        .slice(0, 5)
-        .map(item => `
-            <a is="emby-linkbutton" href="${appRouter.getRouteUrl(item)}" class="vcHomeV2SidebarButton" title="${escapeHtml(item.Name || '')}">
-                <span class="material-icons ${getSidebarLibraryIcon(item)}" aria-hidden="true"></span>
-            </a>`)
-        .join('');
+function isAnimeView(view) {
+    return Boolean(view.Name && ANIME_NAME_PATTERN.test(view.Name));
+}
+
+function getLibraryHref(path, view, collectionType) {
+    if (!view?.Id) return `#${path}`;
+    return `#${path}?topParentId=${encodeURIComponent(view.Id)}&collectionType=${encodeURIComponent(collectionType)}`;
+}
+
+function getSidebarHtml(user, userViews) {
     const adminHref = user.Policy?.IsAdministrator ? appRouter.getRouteUrl('manageserver') : appRouter.getRouteUrl('settings');
+    const movieView = userViews.find(view => view.CollectionType === CollectionType.Movies);
+    const animeView = userViews.find(view => view.CollectionType === CollectionType.Tvshows && isAnimeView(view));
+    const seriesView = userViews.find(view => view.CollectionType === CollectionType.Tvshows && !isAnimeView(view)) || animeView;
+    const animeLink = animeView ? `<a is="emby-linkbutton" href="${getLibraryHref('/tv', animeView, CollectionType.Tvshows)}" class="vcHomeV2SidebarButton" title="Anime" aria-label="Anime"><span class="material-icons" aria-hidden="true">animation</span></a>` : '';
 
     return `
         <aside class="vcHomeV2Sidebar" aria-label="Navegação principal V2">
-            <a is="emby-linkbutton" href="#/home" class="vcHomeV2SidebarLogo" title="Início"><span></span></a>
             <nav class="vcHomeV2SidebarNav">
-                <a is="emby-linkbutton" href="#/home" class="vcHomeV2SidebarButton is-active" title="Início"><span class="material-icons home" aria-hidden="true"></span></a>
-                <a is="emby-linkbutton" href="#/search" class="vcHomeV2SidebarButton" title="Buscar"><span class="material-icons search" aria-hidden="true"></span></a>
-                <a is="emby-linkbutton" href="#/home?tab=1" class="vcHomeV2SidebarButton" title="Favoritos"><span class="material-icons favorite" aria-hidden="true"></span></a>
-                ${libraryLinks}
+                <a is="emby-linkbutton" href="#/home" class="vcHomeV2SidebarButton is-active" title="Início" aria-label="Início"><span class="material-icons" aria-hidden="true">home</span></a>
+                <a is="emby-linkbutton" href="${getLibraryHref('/movies', movieView, CollectionType.Movies)}" class="vcHomeV2SidebarButton" title="Filmes" aria-label="Filmes"><span class="material-icons" aria-hidden="true">movie</span></a>
+                <a is="emby-linkbutton" href="${getLibraryHref('/tv', seriesView, CollectionType.Tvshows)}" class="vcHomeV2SidebarButton" title="Séries" aria-label="Séries"><span class="material-icons" aria-hidden="true">tv</span></a>
+                ${animeLink}
             </nav>
             <nav class="vcHomeV2SidebarNav">
-                <a is="emby-linkbutton" href="${adminHref}" class="vcHomeV2SidebarButton" title="${user.Policy?.IsAdministrator ? 'Admin' : 'Preferências'}"><span class="material-icons ${user.Policy?.IsAdministrator ? 'dashboard' : 'settings'}" aria-hidden="true"></span></a>
-                <a is="emby-linkbutton" href="#/mypreferencesmenu" class="vcHomeV2SidebarButton" title="Configurações"><span class="material-icons settings" aria-hidden="true"></span></a>
+                <a is="emby-linkbutton" href="${adminHref}" class="vcHomeV2SidebarButton" title="${user.Policy?.IsAdministrator ? 'Admin' : 'Preferências'}" aria-label="${user.Policy?.IsAdministrator ? 'Admin' : 'Preferências'}">⚙</a>
             </nav>
         </aside>`;
-}
-
-function getSidebarLibraryIcon(item) {
-    switch (item.CollectionType) {
-        case 'movies':
-            return 'movie';
-        case 'tvshows':
-            return 'tv';
-        case 'music':
-            return 'music_note';
-        case 'boxsets':
-            return 'collections_bookmark';
-        default:
-            return 'video_library';
-    }
 }
 
 function bindQuickFilters(elem) {
@@ -353,7 +343,7 @@ function loadDecisionSection(elem, apiClient, user) {
             <div>
                 <h2 class="sectionTitle sectionTitle-cards">Para assistir agora</h2>
             </div>
-            <a is="emby-linkbutton" href="${appRouter.getRouteUrl('nextup', { serverId: apiClient.serverId() })}" class="raised vcHomeV2SeeAll">Ver próximos</a>
+            <a is="emby-linkbutton" href="${appRouter.getRouteUrl('nextup', { serverId: apiClient.serverId() })}" class="vcHomeV2SeeAll">Ver próximos</a>
         </div>
         <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true" data-scrollbuttons="false">
             <div is="emby-itemscontainer" class="itemsContainer vcHomeV2DecisionRail scrollSlider focuscontainer-x" data-monitor="videoplayback,markplayed"></div>
@@ -397,7 +387,7 @@ function getDecisionCardHtml(apiClient, item) {
 
     return `
         <article class="vcHomeV2DecisionCard" ${itemAttributes}>
-            <a is="emby-linkbutton" href="${url}" class="vcHomeV2DecisionImage itemAction" data-action="${ItemAction.Link}" ${itemAttributes}${imageStyle}>
+            <a is="emby-linkbutton" href="${url}" class="vcHomeV2DecisionImage" ${itemAttributes}${imageStyle}>
                 <span class="vcHomeV2DecisionBadge">${reason}</span>
                 ${progress > 0 ? `<span class="vcHomeV2DecisionProgress"><span style="width:${progress}%"></span></span>` : ''}
             </a>
@@ -406,7 +396,7 @@ function getDecisionCardHtml(apiClient, item) {
                 <small>${subtitle}</small>
                 <div class="vcHomeV2DecisionActions">
                     <button is="emby-button" type="button" class="vcHomeV2TinyPlay itemAction" data-action="${action}" ${itemAttributes}>▶</button>
-                    <a is="emby-linkbutton" href="${url}" class="vcHomeV2TinyLink itemAction" data-action="${ItemAction.Link}" ${itemAttributes}>Detalhes</a>
+                    <a is="emby-linkbutton" href="${url}" class="vcHomeV2TinyLink" ${itemAttributes}>Detalhes</a>
                 </div>
             </div>
         </article>`;
@@ -471,7 +461,7 @@ function loadUtilitySection(elem, apiClient, user, userViews) {
                     <div><span>Status</span><b>Online</b></div>
                     <div><span>Modo</span><b>${user.Policy?.IsAdministrator ? 'Admin' : 'Usuário'}</b></div>
                 </div>
-                <a is="emby-linkbutton" href="${adminLink}" class="raised vcHomeV2AdminLink">Abrir ${user.Policy?.IsAdministrator ? 'admin' : 'preferências'}</a>
+                <a is="emby-linkbutton" href="${adminLink}" class="vcHomeV2AdminLink">Abrir ${user.Policy?.IsAdministrator ? 'admin' : 'preferências'}</a>
             </aside>
         </div>`;
 
@@ -529,9 +519,9 @@ function renderHero(elem, apiClient, item, suggestions = []) {
                 </div>
                 <div class="vcHomeV2Progress"><span style="width:${progress}%"></span></div>
                 <div class="vcHomeV2Actions">
-                    <button is="emby-button" type="button" class="raised button-submit vcHomeV2Primary itemAction" data-action="${ItemAction.Resume}" ${itemAttributes}>▶ Continuar</button>
-                    <a is="emby-linkbutton" href="${url}" class="raised vcHomeV2Secondary itemAction" data-action="${ItemAction.Link}" ${itemAttributes}>Detalhes</a>
-                    <button is="emby-button" type="button" class="raised vcHomeV2Secondary" data-vc-scroll="decision">Ver opções</button>
+                    <button is="emby-button" type="button" class="vcHomeV2Primary itemAction" data-action="${ItemAction.Resume}" ${itemAttributes}>▶ Continuar</button>
+                    <a is="emby-linkbutton" href="${url}" class="vcHomeV2Secondary" ${itemAttributes}>Detalhes</a>
+                    <button is="emby-button" type="button" class="vcHomeV2Secondary" data-vc-scroll="decision">Ver opções</button>
                 </div>
             </div>
             <aside class="vcHomeV2HeroPanel">
@@ -555,7 +545,7 @@ function getHeroSuggestionsHtml(apiClient, suggestions) {
         const itemAttributes = getItemActionAttributes(item, item.ServerId || apiClient.serverId());
 
         return `
-            <a is="emby-linkbutton" href="${url}" class="vcHomeV2NextItem itemAction" data-action="${ItemAction.Link}" ${itemAttributes}>
+            <a is="emby-linkbutton" href="${url}" class="vcHomeV2NextItem" ${itemAttributes}>
                 <span class="vcHomeV2MiniThumb"${imageStyle}></span>
                 <span class="vcHomeV2NextItemText"><b>${escapeHtml(item.Name || '')}</b><small>${escapeHtml(subtitle)}</small></span>
                 <strong class="vcHomeV2NextMetric">${escapeHtml(metric)}</strong>
@@ -766,7 +756,7 @@ function loadNextUpV2(elem, apiClient, user, options) {
             <div>
                 <h2 class="sectionTitle sectionTitle-cards">A seguir</h2>
             </div>
-            <a is="emby-linkbutton" href="${appRouter.getRouteUrl('nextup', { serverId: apiClient.serverId() })}" class="raised vcHomeV2SeeAll">Ver tudo</a>
+            <a is="emby-linkbutton" href="${appRouter.getRouteUrl('nextup', { serverId: apiClient.serverId() })}" class="vcHomeV2SeeAll">Ver tudo</a>
         </div>
         <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true" data-scrollbuttons="false">
             <div is="emby-itemscontainer" class="itemsContainer vcHomeV2NextRail scrollSlider focuscontainer-x" data-monitor="videoplayback,markplayed"></div>
@@ -826,7 +816,7 @@ function loadRecentlyAddedV2(elem, apiClient, user, userViews, options) {
                 <div>
                     <h2 class="sectionTitle sectionTitle-cards">${escapeHtml(view.Name)} recentes</h2>
                 </div>
-                <a is="emby-linkbutton" href="${appRouter.getRouteUrl(view, { section: 'latest' })}" class="raised vcHomeV2SeeAll">Ver biblioteca</a>
+                <a is="emby-linkbutton" href="${appRouter.getRouteUrl(view, { section: 'latest' })}" class="vcHomeV2SeeAll">Ver biblioteca</a>
             </div>
             <div is="emby-scroller" class="padded-top-focusscale padded-bottom-focusscale" data-centerfocus="true" data-scrollbuttons="false">
                 <div is="emby-itemscontainer" class="itemsContainer vcHomeV2LatestRail scrollSlider focuscontainer-x"></div>
@@ -860,7 +850,7 @@ function getLatestCardHtml(apiClient, item, view) {
 
     return `
         <article class="vcHomeV2LatestCard${cardClass}" ${itemAttributes}>
-            <a is="emby-linkbutton" href="${url}" class="vcHomeV2LatestImage itemAction" data-action="${ItemAction.Link}" ${itemAttributes}${imageStyle}></a>
+            <a is="emby-linkbutton" href="${url}" class="vcHomeV2LatestImage" ${itemAttributes}${imageStyle}></a>
             <div class="vcHomeV2LatestBody">
                 <b>${title}</b>
                 <small>${subtitle}</small>
@@ -918,7 +908,7 @@ function getLibraryCardHtml(item) {
     const type = escapeHtml(getLibraryTypeLabel(item));
 
     return `
-        <a is="emby-linkbutton" href="${url}" class="vcHomeV2LibraryCard itemAction" data-action="${ItemAction.Link}" data-id="${item.Id}" data-serverid="${item.ServerId || ''}" data-type="${item.Type}">
+        <a is="emby-linkbutton" href="${url}" class="vcHomeV2LibraryCard" data-id="${item.Id}" data-serverid="${item.ServerId || ''}" data-type="${item.Type}">
             <span class="vcHomeV2LibraryIcon">${getLibraryIcon(item)}</span>
             <span><b>${title}</b><small>${type}</small></span>
         </a>`;
@@ -1002,7 +992,7 @@ function getResumeCardHtml(apiClient, item) {
                 <small>${subtitle}</small>
                 <div class="vcHomeV2ResumeActions">
                     <button is="emby-button" type="button" class="vcHomeV2ResumePrimary itemAction" data-action="${ItemAction.Resume}" ${itemAttributes}>Continuar</button>
-                    <a is="emby-linkbutton" href="${url}" class="vcHomeV2ResumeSecondary itemAction" data-action="${ItemAction.Link}" ${itemAttributes}>Detalhes</a>
+                    <a is="emby-linkbutton" href="${url}" class="vcHomeV2ResumeSecondary" ${itemAttributes}>Detalhes</a>
                 </div>
             </div>
         </article>`;

@@ -1,0 +1,88 @@
+.cineHomeBody {
+    min-height: 90vh;
+}
+
+.cineHomeHero {
+    min-height: 70vh;
+}
+
+.cineHomeHeroContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    max-width: 38rem;
+    padding: 5rem 2.5rem 2.5rem;
+}
+
+.cineHomeTitle {
+    max-width: 18ch;
+}
+
+.cineHomeEyebrow {
+    display: inline-block;
+    width: fit-content;
+    padding: 0.35rem 0.7rem;
+    border-radius: 0.4rem;
+    background: color-mix(in srgb, var(--cine-accent) 18%, transparent);
+    color: var(--cine-accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+}
+
+.cineHomeMeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--cine-text-soft);
+    font-size: 0.9rem;
+    margin-top: 0.9rem;
+}
+
+.cineHomeProgress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.9rem;
+    max-width: 32rem;
+}
+
+.cineHomeProgressBar {
+    flex: 1;
+    height: 0.32rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.18);
+    overflow: hidden;
+}
+
+.cineHomeProgressBar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--cine-accent), var(--cine-accent-2));
+}
+
+.cineHomeProgressLabel {
+    color: var(--cine-text);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.cineHomeActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.4rem;
+}
+
+.cineTiltResume {
+    display: inline-block;
+}
+
+.cineTiltResume .cineCard {
+    width: 18rem;
+}
