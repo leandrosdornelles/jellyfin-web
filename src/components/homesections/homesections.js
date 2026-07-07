@@ -7,6 +7,7 @@ import { getLatestMediaQuery } from 'apps/legacy/features/libraries/api/useLates
 import { getNextUpQuery } from 'apps/legacy/features/libraries/api/useNextUp';
 import { getResumeItemsQuery } from 'apps/legacy/features/libraries/api/useResumeItems';
 import { getUserViewsQuery } from 'hooks/api/useUserViews';
+import itemShortcuts from 'components/shortcuts';
 import { appRouter } from 'components/router/appRouter';
 import globalize from 'lib/globalize';
 import ServerConnections from 'lib/jellyfin-apiclient/ServerConnections';
@@ -30,6 +31,7 @@ const ANIME_NAME_PATTERN = /anime|animes/i;
 let searchShortcutBound = false;
 let headerObserverBound = false;
 let currentHeroItemId = null;
+const itemShortcutContainers = new WeakSet();
 
 export function getDefaultSection(index) {
     if (index < 0 || index > DEFAULT_SECTIONS.length) return '';
@@ -119,6 +121,7 @@ export function loadSections(elem, apiClient, user, userSettings) {
                 elem.classList.add('homeSectionsContainer');
                 bindQuickFilters(elem);
                 bindDecisionShortcuts(elem);
+                bindItemShortcuts(elem);
                 bindSearchShortcut();
 
                 const heroPromise = loadHero(elem.querySelector('.vcHomeV2Hero'), apiClient, user);
@@ -238,6 +241,15 @@ function bindDecisionShortcuts(elem) {
     });
 }
 
+function bindItemShortcuts(elem) {
+    if (itemShortcutContainers.has(elem)) return;
+
+    itemShortcutContainers.add(elem);
+    elem.addEventListener('click', event => {
+        itemShortcuts.onClick.call(elem, event);
+    });
+}
+
 function bindSearchShortcut() {
     if (searchShortcutBound) return;
 
@@ -266,9 +278,13 @@ function applyDecisionFilter(elem, filter) {
     itemsContainer?.refreshItems?.();
 }
 
+function getSdkApi(apiClient) {
+    return ServerConnections.getApi(apiClient.serverId());
+}
+
 function getResumeItems(apiClient, user, limit) {
     return queryClient
-        .fetchQuery(getResumeItemsQuery(toApi(apiClient), {
+        .fetchQuery(getResumeItemsQuery(getSdkApi(apiClient), {
             userId: user.Id || apiClient.getCurrentUserId(),
             limit,
             fields: ['PrimaryImageAspectRatio', 'Overview'],
@@ -282,7 +298,7 @@ function getResumeItems(apiClient, user, limit) {
 
 function getNextUpItems(apiClient, user, limit) {
     return queryClient
-        .fetchQuery(getNextUpQuery(toApi(apiClient), {
+        .fetchQuery(getNextUpQuery(getSdkApi(apiClient), {
             userId: user.Id || apiClient.getCurrentUserId(),
             limit,
             fields: ['PrimaryImageAspectRatio', 'DateCreated', 'MediaSourceCount'],
@@ -296,7 +312,7 @@ function getNextUpItems(apiClient, user, limit) {
 
 function getLatestItems(apiClient, user, limit, parentId) {
     return queryClient
-        .fetchQuery(getLatestMediaQuery(toApi(apiClient), {
+        .fetchQuery(getLatestMediaQuery(getSdkApi(apiClient), {
             userId: user.Id || apiClient.getCurrentUserId(),
             limit,
             fields: ['PrimaryImageAspectRatio', 'Path'],
