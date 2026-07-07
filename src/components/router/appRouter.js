@@ -8,7 +8,6 @@ import alert from '../alert';
 
 import { getItemQuery } from 'hooks/useItem';
 import { ServerConnections } from 'lib/jellyfin-apiclient';
-import { toApi } from 'utils/jellyfin-apiclient/compat';
 import { queryClient } from 'utils/query/queryClient';
 import { history } from 'RootAppRouter';
 
@@ -137,8 +136,8 @@ class AppRouter {
     showItem(item, serverId, options) {
         // TODO: Refactor this so it only gets items, not strings.
         if (typeof item === 'string') {
+            const api = ServerConnections.getApi(serverId);
             const apiClient = serverId ? ServerConnections.getApiClient(serverId) : ServerConnections.currentApiClient();
-            const api = toApi(apiClient);
             const userId = apiClient.getCurrentUserId();
 
             queryClient
@@ -405,11 +404,10 @@ class AppRouter {
             return url;
         }
 
-        const isExperimentalLayout = true;
+        const isModernLayout = true;
 
         if (context !== 'folders' && !itemHelper.isLocalItem(item)) {
-
-            if (isExperimentalLayout && item.CollectionType == CollectionType.Books) {
+            if (isModernLayout && item.CollectionType == CollectionType.Books) {
                 url = `#/books?topParentId=${item.Id}&collectionType=${item.CollectionType}`;
 
                 if (options?.section === 'latest') {
@@ -448,11 +446,11 @@ class AppRouter {
                 return url;
             }
 
-            if (isExperimentalLayout && item.CollectionType == CollectionType.Homevideos) {
+            if (isModernLayout && item.CollectionType == CollectionType.Homevideos) {
                 return '#/homevideos?topParentId=' + item.Id;
             }
 
-            if (isExperimentalLayout && item.CollectionType == CollectionType.Musicvideos) {
+            if (isModernLayout && item.CollectionType == CollectionType.Musicvideos) {
                 url = `#/musicvideos?topParentId=${item.Id}&collectionType=${item.CollectionType}`;
 
                 if (options?.section === 'latest') {
@@ -461,15 +459,15 @@ class AppRouter {
                 return url;
             }
 
-            if (isExperimentalLayout && item.CollectionType == CollectionType.Boxsets) {
+            if (isModernLayout && item.CollectionType == CollectionType.Boxsets) {
                 return `#/boxsets?topParentId=${item.Id}&collectionType=${item.CollectionType}`;
             }
 
-            if (isExperimentalLayout && item.CollectionType == CollectionType.Playlists) {
+            if (isModernLayout && item.CollectionType == CollectionType.Playlists) {
                 return `#/playlists?topParentId=${item.Id}&collectionType=${item.CollectionType}`;
             }
 
-            if (isExperimentalLayout && item.CollectionType == null && item.Type === 'CollectionFolder') {
+            if (isModernLayout && item.CollectionType == null && item.Type === 'CollectionFolder') {
                 url = `#/mixed?topParentId=${item.Id}&collectionType=mixed`;
 
                 if (options?.section === 'latest') {
@@ -489,14 +487,14 @@ class AppRouter {
         const contextSuffix = context ? '&context=' + context : '';
 
         if (itemType == 'Series' || itemType == 'Season' || itemType == 'Episode') {
-            if (isExperimentalLayout) {
+            if (isModernLayout) {
                 return '#/cinedetails?id=' + id + contextSuffix + '&serverId=' + serverId;
             }
 
             return '#/details?id=' + id + contextSuffix + '&serverId=' + serverId;
         }
 
-        if (isExperimentalLayout && itemType == 'Movie') {
+        if (isModernLayout && itemType == 'Movie') {
             return '#/cinedetails?id=' + id + '&serverId=' + serverId;
         }
 

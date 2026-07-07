@@ -131,7 +131,7 @@ export function CineEpisodeDetail({ itemId, activeNav }: Props) {
     const { data: playbackItem } = useCinePlaybackInfo(itemId);
     const { user } = useApi();
     const apiClient = user?.ServerId ?
-        ServerConnections.getApiClient(user.ServerId) :
+        ServerConnections.getApiClient(user.ServerId) ?? null :
         ServerConnections.currentApiClient() ?? null;
 
     const isLoading = itemLoading;

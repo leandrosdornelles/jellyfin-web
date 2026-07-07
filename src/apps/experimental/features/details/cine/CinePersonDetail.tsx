@@ -111,7 +111,7 @@ export function CinePersonDetail({ itemId }: Props) {
     const { user } = useApi();
     const { data: userViewsData } = useUserViews();
     const apiClient = user?.ServerId ?
-        ServerConnections.getApiClient(user.ServerId) :
+        ServerConnections.getApiClient(user.ServerId) ?? null :
         ServerConnections.currentApiClient() ?? null;
     const person = item?.Type === 'Person' ? item : null;
     const sidebarItems = useMemo(() => getCineSidebarItems(userViewsData?.Items || []), [userViewsData?.Items]);

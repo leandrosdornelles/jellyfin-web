@@ -141,7 +141,7 @@ export function CineSeriesDetail({ itemId, activeNav }: Props) {
     const { data: seasons } = useCineSeasons(itemId);
     const { user } = useApi();
     const apiClient = user?.ServerId ?
-        ServerConnections.getApiClient(user.ServerId) :
+        ServerConnections.getApiClient(user.ServerId) ?? null :
         ServerConnections.currentApiClient() ?? null;
 
     const isLoading = itemLoading;

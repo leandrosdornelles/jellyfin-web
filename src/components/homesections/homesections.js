@@ -3,14 +3,14 @@ import layoutManager from 'components/layoutManager';
 import escapeHtml from 'escape-html';
 import { DEFAULT_SECTIONS, HomeSectionType } from 'constants/homeSectionType';
 import { ItemAction } from 'constants/itemAction';
-import { getLatestMediaQuery } from 'apps/stable/features/libraries/api/useLatestMedia';
-import { getNextUpQuery } from 'apps/stable/features/libraries/api/useNextUp';
-import { getResumeItemsQuery } from 'apps/stable/features/libraries/api/useResumeItems';
+import { getLatestMediaQuery } from 'apps/legacy/features/libraries/api/useLatestMedia';
+import { getNextUpQuery } from 'apps/legacy/features/libraries/api/useNextUp';
+import { getResumeItemsQuery } from 'apps/legacy/features/libraries/api/useResumeItems';
 import { getUserViewsQuery } from 'hooks/api/useUserViews';
 import { appRouter } from 'components/router/appRouter';
 import globalize from 'lib/globalize';
+import ServerConnections from 'lib/jellyfin-apiclient/ServerConnections';
 import Dashboard from 'utils/dashboard';
-import { toApi } from 'utils/jellyfin-apiclient/compat';
 import { queryClient } from 'utils/query/queryClient';
 
 import { loadRecordings } from './sections/activeRecordings';
@@ -87,9 +87,10 @@ export function loadSections(elem, apiClient, user, userSettings) {
     hideHomeHeader();
     bindHeaderObserver();
 
+    const api = ServerConnections.getApi(apiClient.serverId());
     const userId = user.Id || apiClient.getCurrentUserId();
     return queryClient
-        .fetchQuery(getUserViewsQuery(toApi(apiClient), { userId }))
+        .fetchQuery(getUserViewsQuery(api, { userId }))
         .then(result => result.Items || [])
         .then(function (userViews) {
             let html = '';
@@ -1026,4 +1027,3 @@ export default {
     pause,
     resume
 };
-
