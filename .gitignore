@@ -2,6 +2,7 @@
 dist
 web
 node_modules
+docs
 
 # test coverage
 coverage
